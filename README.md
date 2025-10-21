@@ -74,6 +74,7 @@ For live events, deploy to Streamlit Community Cloud or another hosting platform
 ```
 expect_miracles_app/
 ├── app.py                          # Main Streamlit application
+├── generate_qr.py                  # QR code generator for events
 ├── requirements.txt                # Python dependencies
 ├── .gitignore                      # Git ignore rules
 ├── .streamlit/
@@ -87,6 +88,40 @@ expect_miracles_app/
 2. **Enter Details**: Provide first name and select an optional superhero accessory
 3. **Generate**: AI creates a unique superhero transformation
 4. **Share**: Download and share the superhero image on social media
+
+## QR Code Generator for Events
+
+The `generate_qr.py` script creates branded QR codes for your event in multiple sizes.
+
+### Generate QR Codes
+
+1. Deploy your Streamlit app and get the URL
+2. Update the `APP_URL` in `generate_qr.py`
+3. Run the generator:
+
+```bash
+pip install qrcode[pil]
+python generate_qr.py
+```
+
+This will create three QR code sizes:
+- **Standard** (300px): Perfect for table tents and handouts (3x5 inches)
+- **Large** (600px): Ideal for posters and banners (11x17 inches)
+- **Poster** (900px): Best for large displays and projection (24x36 inches)
+
+### QR Code Features
+
+- Branded in Expect Miracles colors (Navy blue on white)
+- Rounded corners for modern appearance
+- High error correction for reliable scanning
+- Optimized for print at 300 DPI
+
+### Printing Tips
+
+- Print at 300 DPI for best quality
+- Use high-quality cardstock for table tents
+- Test QR codes before printing large quantities
+- Include a short URL or text backup below the QR code
 
 ## Configuration
 

@@ -32,6 +32,7 @@ ENV/
 
 # Generated images
 generated_images/
+expect_miracles_qr*.png
 
 # IDE
 .vscode/
