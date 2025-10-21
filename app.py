@@ -204,17 +204,23 @@ def init_session_state():
 # ============================================================================
 def setup_openai():
     """Configure OpenAI API with secrets management"""
-    try:
-        # In production, use Streamlit secrets
-        if 'openai' in st.secrets:
-            openai.api_key = st.secrets['openai']['api_key']
-        else:
-            # Fallback for local development
-            openai.api_key = os.getenv('OPENAI_API_KEY')
-        return True
-    except Exception as e:
-        st.error(f"⚠️ OpenAI API key not configured. Please add it to secrets.toml")
-        return False
+    # INTERFACE DEVELOPMENT MODE: Always return True to bypass API check
+    # This allows you to work on the interface without an API key
+    return True
+    
+    # COMMENTED OUT FOR INTERFACE DEVELOPMENT
+    # Uncomment this section when ready to enable API functionality
+    # try:
+    #     # In production, use Streamlit secrets
+    #     if 'openai' in st.secrets:
+    #         openai.api_key = st.secrets['openai']['api_key']
+    #     else:
+    #         # Fallback for local development
+    #         openai.api_key = os.getenv('OPENAI_API_KEY')
+    #     return True
+    # except Exception as e:
+    #     st.error(f"⚠️ OpenAI API key not configured. Please add it to secrets.toml")
+    #     return False
 
 # ============================================================================
 # IMAGE PROCESSING FUNCTIONS
@@ -565,33 +571,27 @@ def main():
     # Initialize session state
     init_session_state()
     
-    # Setup OpenAI (check if API key is configured)
+    # Setup OpenAI (always returns True in interface development mode)
     api_configured = setup_openai()
     
     # Render header
     render_header()
     
+    # Show interface development mode notice
+    st.info("🎨 **Interface Development Mode Active**: You can design and test the full interface without an API key. Image generation is disabled.")
+    
     # Render step indicator
     render_step_indicator(st.session_state.step)
     
-    # Route to appropriate step
-    if not api_configured:
-        st.error("⚠️ Please configure your OpenAI API key to use this app.")
-        st.info("Add your API key to `.streamlit/secrets.toml` file")
-        st.code('''
-# .streamlit/secrets.toml
-[openai]
-api_key = "your-api-key-here"
-        ''')
-    else:
-        if st.session_state.step == 1:
-            step_1_upload()
-        elif st.session_state.step == 2:
-            step_2_details()
-        elif st.session_state.step == 3:
-            step_3_generate()
-        elif st.session_state.step == 4:
-            step_4_share()
+    # Always show the interface - no API check blocking
+    if st.session_state.step == 1:
+        step_1_upload()
+    elif st.session_state.step == 2:
+        step_2_details()
+    elif st.session_state.step == 3:
+        step_3_generate()
+    elif st.session_state.step == 4:
+        step_4_share()
     
     # Render footer
     render_footer()
