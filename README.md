@@ -145,21 +145,6 @@ Brand colors (customizable in `app.py`):
 - Use environment variables or Streamlit secrets for API keys
 - The app doesn't store uploaded photos permanently (they're in session state only)
 
-## Contributing
-
-Contributions are welcome! Please follow the standard git workflow:
-1. Create a feature branch
-2. Make your changes
-3. Submit a pull request
-
-## Support
-
-For questions or support, contact the Expect Miracles Foundation development team.
-
-## License
-
-© 2025 Expect Miracles Foundation - All Rights Reserved
-
 ## Acknowledgments
 
 - Built with [Streamlit](https://streamlit.io/)
