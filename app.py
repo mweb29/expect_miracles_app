@@ -85,7 +85,16 @@ def apply_custom_css():
         justify-content: center;
         align-items: center;
         gap: 1rem;
-        margin-bottom: 2rem;
+        margin: 2rem auto;
+        padding: 1rem;
+        max-width: 600px;
+    }
+    
+    .step-indicator > div {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex: 1;
     }
     
     .step {
@@ -97,6 +106,7 @@ def apply_custom_css():
         justify-content: center;
         font-weight: bold;
         font-size: 1.2rem;
+        margin-bottom: 0.5rem;
     }
     
     .step-active {
@@ -329,24 +339,64 @@ def render_header():
 
 def render_step_indicator(current_step):
     """Render step progress indicator"""
+    
+    # Using Streamlit columns instead of HTML for better compatibility
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    col1, col2, col3, col4 = st.columns(4)
+    
     steps = [
-        ("1", "Upload", 1),
-        ("2", "Details", 2),
-        ("3", "Generate", 3),
-        ("4", "Share", 4)
+        (col1, "1", "Upload", 1),
+        (col2, "2", "Details", 2),
+        (col3, "3", "Generate", 3),
+        (col4, "4", "Share", 4)
     ]
     
-    step_html = '<div class="step-indicator">'
-    for num, label, step_num in steps:
-        active_class = "step-active" if step_num <= current_step else "step-inactive"
-        step_html += f'''
-        <div>
-            <div class="step {active_class}">{num}</div>
-            <div style="text-align: center; margin-top: 0.5rem; color: white; font-size: 0.9rem;">{label}</div>
-        </div>
-        '''
-    step_html += '</div>'
-    st.markdown(step_html, unsafe_allow_html=True)
+    for col, num, label, step_num in steps:
+        with col:
+            # Determine if step is active
+            if step_num <= current_step:
+                # Active step - cyan background
+                st.markdown(f"""
+                    <div style="text-align: center;">
+                        <div style="
+                            width: 50px;
+                            height: 50px;
+                            border-radius: 50%;
+                            background: #00d4ff;
+                            color: white;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-weight: bold;
+                            font-size: 1.2rem;
+                            margin: 0 auto;
+                        ">{num}</div>
+                        <div style="color: black; margin-top: 0.5rem; font-size: 0.9rem;">{label}</div>
+                    </div>
+                """, unsafe_allow_html=True)
+            else:
+                # Inactive step - gray background
+                st.markdown(f"""
+                    <div style="text-align: center;">
+                        <div style="
+                            width: 50px;
+                            height: 50px;
+                            border-radius: 50%;
+                            background: #ddd;
+                            color: #999;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-weight: bold;
+                            font-size: 1.2rem;
+                            margin: 0 auto;
+                        ">{num}</div>
+                        <div style="color: black; margin-top: 0.5rem; font-size: 0.9rem;">{label}</div>
+                    </div>
+                """, unsafe_allow_html=True)
+    
+    st.markdown("<br>", unsafe_allow_html=True)
 
 def render_footer():
     """Render app footer"""
@@ -365,7 +415,7 @@ def step_1_upload():
     """Step 1: Photo Upload"""
     st.markdown('<div class="content-card">', unsafe_allow_html=True)
     
-    st.markdown("### 📸 Step 1: Upload Your Photo")
+    st.markdown("### Step 1: Upload Your Photo")
     st.markdown("Choose a clear photo of yourself for the best superhero transformation")
     
     # File uploader with camera support for mobile
@@ -397,7 +447,7 @@ def step_2_details():
     """Step 2: Personal Details"""
     st.markdown('<div class="content-card">', unsafe_allow_html=True)
     
-    st.markdown("### 🦸 Step 2: Your Details")
+    st.markdown("### Step 2: Your Details")
     st.markdown("Tell us about yourself to create your unique superhero identity")
     
     # Show uploaded image thumbnail
@@ -448,7 +498,7 @@ def step_2_details():
             st.rerun()
     
     with col2:
-        if st.button("🚀 Generate My Superhero!", key="generate_button", type="primary"):
+        if st.button("Generate My Superhero!", key="generate_button", type="primary"):
             if not first_name.strip():
                 st.error("⚠️ Please enter your first name to continue")
             else:
@@ -491,7 +541,7 @@ def step_3_generate():
     
     # TEMPORARY: Skip to step 4 for interface testing
     st.markdown("### ⚡ Generating Your Superhero...")
-    st.info("🎨 **Interface Testing Mode**: Image generation is disabled. Click below to preview the results page.")
+    st.info("**Interface Testing Mode**: Image generation is disabled. Click below to preview the results page.")
     
     if st.button("⏭️ Skip to Results Page (Testing)", key="skip_to_results"):
         # Use a placeholder image URL for testing
