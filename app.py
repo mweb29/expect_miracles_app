@@ -34,15 +34,45 @@ def apply_custom_css():
     """Apply custom CSS for mobile-first, branded design"""
     st.markdown("""
     <style>
-    /* Brand colors: Navy (#1a237e), Gold (#ffd700), White */
+    /* Brand colors: Navy (#1a237e), Blue (#3949ab), Gold (#ffd700), White */
     
-    /* Main container styling */
-    .main {
-        background: linear-gradient(135deg, #1a237e 0%, #3949ab 100%);
-        padding: 1rem;
+    /* Force blue gradient background on all container elements */
+    .stApp {
+        background: linear-gradient(180deg, #1e3a8a 0%, #3b82f6 50%, #60a5fa 100%);
     }
     
-    /* Header styling */
+    /* Main app background - blue gradient like reference images */
+    .main {
+        background: linear-gradient(180deg, #1e3a8a 0%, #3b82f6 50%, #60a5fa 100%);
+        padding: 1rem;
+        min-height: 100vh;
+    }
+    
+    /* Streamlit's default block container */
+    .block-container {
+        background: transparent !important;
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+    }
+    
+    /* Override any white backgrounds */
+    [data-testid="stAppViewContainer"] {
+        background: linear-gradient(180deg, #1e3a8a 0%, #3b82f6 50%, #60a5fa 100%);
+    }
+    
+    [data-testid="stHeader"] {
+        background: transparent;
+    }
+    
+    /* Only make text white when directly on blue background (not in cards) */
+    .main > .block-container > div > div > div > p,
+    .main > .block-container > div > div > div > h1,
+    .main > .block-container > div > div > div > h2,
+    .main > .block-container > div > div > div > h3 {
+        color: white;
+    }
+    
+    /* Header styling - keep white background with dark text */
     .header-container {
         background: white;
         padding: 2rem;
@@ -52,71 +82,44 @@ def apply_custom_css():
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
     
+    .header-container * {
+        color: inherit;
+    }
+    
     .main-title {
-        color: #1a237e;
+        color: #1a237e !important;
         font-size: 2.5rem;
         font-weight: bold;
         margin-bottom: 0.5rem;
     }
     
     .subtitle {
-        color: #ffd700;
+        color: #ffd700 !important;
         font-size: 1.5rem;
         font-weight: 600;
         margin-bottom: 0.5rem;
     }
     
     .tagline {
-        color: #666;
+        color: #666 !important;
         font-size: 1.1rem;
     }
     
-    /* Card styling for main content */
+    /* Card styling for main content - white cards with dark text */
     .content-card {
         background: white;
         padding: 2rem;
         border-radius: 15px;
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        margin-bottom: 1rem;
     }
     
-    /* Step indicator */
-    .step-indicator {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 1rem;
-        margin: 2rem auto;
-        padding: 1rem;
-        max-width: 600px;
+    .content-card * {
+        color: #333 !important;
     }
     
-    .step-indicator > div {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        flex: 1;
-    }
-    
-    .step {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        font-size: 1.2rem;
-        margin-bottom: 0.5rem;
-    }
-    
-    .step-active {
-        background: #00d4ff;
-        color: white;
-    }
-    
-    .step-inactive {
-        background: #ddd;
-        color: #999;
+    .content-card h1, .content-card h2, .content-card h3 {
+        color: #1a237e !important;
     }
     
     /* Button styling */
@@ -174,6 +177,16 @@ def apply_custom_css():
         font-size: 0.9rem;
     }
     
+    .footer p, .footer strong {
+        color: white !important;
+    }
+    
+    /* Info/warning boxes on blue background */
+    .stAlert {
+        background-color: rgba(255, 255, 255, 0.95);
+        border-radius: 10px;
+    }
+    
     /* Mobile responsiveness */
     @media (max-width: 768px) {
         .main-title {
@@ -190,6 +203,7 @@ def apply_custom_css():
     /* Hide Streamlit branding */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
+    header {visibility: hidden;}
     </style>
     """, unsafe_allow_html=True)
 
@@ -372,7 +386,7 @@ def render_step_indicator(current_step):
                             font-size: 1.2rem;
                             margin: 0 auto;
                         ">{num}</div>
-                        <div style="color: black; margin-top: 0.5rem; font-size: 0.9rem;">{label}</div>
+                        <div style="color: white; margin-top: 0.5rem; font-size: 0.9rem;">{label}</div>
                     </div>
                 """, unsafe_allow_html=True)
             else:
@@ -392,7 +406,7 @@ def render_step_indicator(current_step):
                             font-size: 1.2rem;
                             margin: 0 auto;
                         ">{num}</div>
-                        <div style="color: black; margin-top: 0.5rem; font-size: 0.9rem;">{label}</div>
+                        <div style="color: white; margin-top: 0.5rem; font-size: 0.9rem;">{label}</div>
                     </div>
                 """, unsafe_allow_html=True)
     
@@ -415,7 +429,7 @@ def step_1_upload():
     """Step 1: Photo Upload"""
     st.markdown('<div class="content-card">', unsafe_allow_html=True)
     
-    st.markdown("### Step 1: Upload Your Photo")
+    st.markdown("### 📸 Step 1: Upload Your Photo")
     st.markdown("Choose a clear photo of yourself for the best superhero transformation")
     
     # File uploader with camera support for mobile
@@ -447,7 +461,7 @@ def step_2_details():
     """Step 2: Personal Details"""
     st.markdown('<div class="content-card">', unsafe_allow_html=True)
     
-    st.markdown("### Step 2: Your Details")
+    st.markdown("### 🦸 Step 2: Your Details")
     st.markdown("Tell us about yourself to create your unique superhero identity")
     
     # Show uploaded image thumbnail
@@ -498,7 +512,7 @@ def step_2_details():
             st.rerun()
     
     with col2:
-        if st.button("Generate My Superhero!", key="generate_button", type="primary"):
+        if st.button("🚀 Generate My Superhero!", key="generate_button", type="primary"):
             if not first_name.strip():
                 st.error("⚠️ Please enter your first name to continue")
             else:
@@ -541,7 +555,7 @@ def step_3_generate():
     
     # TEMPORARY: Skip to step 4 for interface testing
     st.markdown("### ⚡ Generating Your Superhero...")
-    st.info("**Interface Testing Mode**: Image generation is disabled. Click below to preview the results page.")
+    st.info("🎨 **Interface Testing Mode**: Image generation is disabled. Click below to preview the results page.")
     
     if st.button("⏭️ Skip to Results Page (Testing)", key="skip_to_results"):
         # Use a placeholder image URL for testing
