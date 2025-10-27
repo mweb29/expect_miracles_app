@@ -9,7 +9,7 @@ Tech Stack: Streamlit + OpenAI DALL-E 3
 """
 
 import streamlit as st
-import openai
+from openai import OpenAI
 from datetime import datetime
 import base64
 from io import BytesIO
@@ -220,31 +220,46 @@ def init_session_state():
         st.session_state.generated_image_url = None
     if 'first_name' not in st.session_state:
         st.session_state.first_name = ""
+    if 'last_name' not in st.session_state:
+        st.session_state.last_name = ""
     if 'accessory' not in st.session_state:
         st.session_state.accessory = "None"
+    if 'openai_client' not in st.session_state:
+        st.session_state.openai_client = None
 
 # ============================================================================
 # OPENAI API SETUP
 # ============================================================================
 def setup_openai():
     """Configure OpenAI API with secrets management"""
-    # INTERFACE DEVELOPMENT MODE: Always return True to bypass API check
-    # This allows you to work on the interface without an API key
-    return True
-    
-    # COMMENTED OUT FOR INTERFACE DEVELOPMENT
-    # Uncomment this section when ready to enable API functionality
-    # try:
-    #     # In production, use Streamlit secrets
-    #     if 'openai' in st.secrets:
-    #         openai.api_key = st.secrets['openai']['api_key']
-    #     else:
-    #         # Fallback for local development
-    #         openai.api_key = os.getenv('OPENAI_API_KEY')
-    #     return True
-    # except Exception as e:
-    #     st.error(f"⚠️ OpenAI API key not configured. Please add it to secrets.toml")
-    #     return False
+    try:
+        # Debug: Check what's available
+        api_key = None
+        
+        # Try to get from Streamlit secrets
+        if hasattr(st, 'secrets') and 'openai' in st.secrets:
+            api_key = st.secrets['openai']['api_key']
+            st.info(f"🔍 Found API key in secrets (starts with: {api_key[:10]}...)")
+        # Try environment variable
+        elif os.getenv('OPENAI_API_KEY'):
+            api_key = os.getenv('OPENAI_API_KEY')
+            st.info(f"🔍 Found API key in environment (starts with: {api_key[:10]}...)")
+        else:
+            st.error("❌ No API key found in secrets.toml or environment variables")
+            return None
+        
+        if not api_key or not api_key.startswith('sk-'):
+            st.error(f"❌ Invalid API key format. Key should start with 'sk-' but got: {api_key[:10] if api_key else 'None'}...")
+            return None
+        
+        # Create OpenAI client with minimal configuration
+        client = OpenAI(api_key=api_key)
+        st.success("✅ OpenAI client created successfully")
+        return client
+        
+    except Exception as e:
+        st.error(f"⚠️ Error configuring OpenAI: {str(e)}")
+        return None
 
 # ============================================================================
 # IMAGE PROCESSING FUNCTIONS
@@ -279,40 +294,109 @@ def save_generated_image(image_url, first_name):
 # ============================================================================
 # AI IMAGE GENERATION
 # ============================================================================
-def generate_superhero_image(uploaded_image, first_name, accessory):
+def generate_superhero_image(uploaded_image, first_name, last_name, accessory):
     """
-    Generate superhero image using OpenAI DALL-E 3
+    Generate superhero action figure image using OpenAI DALL-E 3
     
     Parameters:
     - uploaded_image: PIL Image object
     - first_name: User's first name
+    - last_name: User's last name
     - accessory: Selected accessory/prop
     
     Returns:
     - image_url: URL of generated image or None if failed
     """
     
-    # Build the prompt based on user inputs
-    accessory_text = f" holding a {accessory}" if accessory != "None" else ""
+    # Get OpenAI client from session state
+    if 'openai_client' not in st.session_state or st.session_state.openai_client is None:
+        st.error("OpenAI client not initialized")
+        return None
     
-    prompt = f"""Create a heroic, inspiring portrait of a person{accessory_text} standing confidently 
-    as a superhero fighting against cancer. The scene should be uplifting and powerful, 
-    with a vibrant background featuring symbolic elements like:
-    - Hope and strength imagery (light rays, empowering colors)
-    - Subtle cancer awareness elements (ribbons, medical symbols)
-    - A heroic, determined pose
+    client = st.session_state.openai_client
     
-    Style: Photorealistic, professional, inspiring, full of positive energy.
-    The person should look confident and heroic, ready to take action against cancer.
-    Make it look like a professional superhero portrait with warm, hopeful lighting.
+    # Build full name for display
+    full_name = f"{first_name} {last_name}"
     
-    Name to incorporate (subtle text or as inspiration): {first_name}"""
+    # Build accessories text based on user selection
+    if accessory == "None":
+        accessories_text = ""
+        accessories_instruction = "- No additional accessories included in the blister pack"
+    elif accessory == "Golf Club":
+        accessories_text = "golf club and golf ball"
+        accessories_instruction = f"- Display these accessories next to the figure in the blister pack: {accessories_text}"
+    elif accessory == "Tennis Racket":
+        accessories_text = "tennis racket and tennis ball"
+        accessories_instruction = f"- Display these accessories next to the figure in the blister pack: {accessories_text}"
+    elif accessory == "Stethoscope":
+        accessories_text = "stethoscope and medical bag"
+        accessories_instruction = f"- Display these accessories next to the figure in the blister pack: {accessories_text}"
+    elif accessory == "Basketball":
+        accessories_text = "basketball and sports drink"
+        accessories_instruction = f"- Display these accessories next to the figure in the blister pack: {accessories_text}"
+    elif accessory == "Camera":
+        accessories_text = "camera and photography equipment"
+        accessories_instruction = f"- Display these accessories next to the figure in the blister pack: {accessories_text}"
+    elif accessory == "Microphone":
+        accessories_text = "microphone and speaker"
+        accessories_instruction = f"- Display these accessories next to the figure in the blister pack: {accessories_text}"
+    elif accessory == "Chef's Hat":
+        accessories_text = "chef's hat and cooking utensils"
+        accessories_instruction = f"- Display these accessories next to the figure in the blister pack: {accessories_text}"
+    elif accessory == "Artist's Paintbrush":
+        accessories_text = "paintbrush and art palette"
+        accessories_instruction = f"- Display these accessories next to the figure in the blister pack: {accessories_text}"
+    elif accessory == "Laptop":
+        accessories_text = "laptop and tech gadgets"
+        accessories_instruction = f"- Display these accessories next to the figure in the blister pack: {accessories_text}"
+    elif accessory == "Music Instrument":
+        accessories_text = "musical instrument and headphones"
+        accessories_instruction = f"- Display these accessories next to the figure in the blister pack: {accessories_text}"
+    else:
+        accessories_text = f"{accessory.lower()} and related equipment"
+        accessories_instruction = f"- Display these accessories next to the figure in the blister pack: {accessories_text}"
+    
+    # Use the vintage-style prompt with Expect Miracles color scheme
+    prompt = f"""Create a vintage-style retail action figure package design based on the uploaded photo. This is for a cancer charity event with the theme "Taking Action Against Cancer."
+
+CRITICAL REQUIREMENTS:
+- The action figure MUST accurately represent the person in the uploaded photo - matching their gender, appearance, facial features, hair color and style, and clothing
+- The package should face directly forward (front view), not at an angle
+- Style: Classic 1970s-80s action figure packaging (similar to vintage Kenner or Mego toys) - simple, nostalgic, retro aesthetic
+- The figure should look realistic and lifelike, representing the actual person
+- Only include text that is specifically requested below - no other words or phrases
+
+PACKAGING DESIGN:
+- Retro blister pack style with clear plastic bubble showing the figure
+- Simple cardboard backing with rounded corners
+- Color palette: Navy blue and gold/yellow accents (Expect Miracles brand colors) with warm vintage tones
+- Clean, straightforward design - not cluttered or busy
+- Front-facing orientation (viewer looking directly at the front of the package)
+
+PACKAGING TEXT (ONLY THESE):
+- Name at top: "{full_name}"
+- Main phrase somewhere on package: "I'M TAKING ACTION AGAINST CANCER"
+- Small label: "ACTION FIGURE"
+- No other text, descriptions, warnings, or fine print
+
+INCLUDED ACCESSORIES:
+{accessories_instruction}
+
+DESIGN SPECIFICATIONS:
+- Vintage toy aesthetic - simple and iconic
+- The figure should be dressed in casual/normal clothing (as shown in the photo)
+- Bold, inspiring but tasteful presentation
+- Do NOT depict cancer cells or medical imagery
+- Professional product photography lighting
+- Make it look like a collectible from a classic toy line
+
+Create a nostalgic, store-ready design that captures the charm of vintage action figure packaging with navy blue and gold color scheme."""
     
     try:
         # Show progress to user
-        with st.spinner("🦸 Transforming you into a superhero... This may take 30-60 seconds..."):
+        with st.spinner("🦸 Transforming you into a vintage action figure... This may take 30-60 seconds..."):
             # Call OpenAI DALL-E 3 API
-            response = openai.images.generate(
+            response = client.images.generate(
                 model="dall-e-3",
                 prompt=prompt,
                 size="1024x1024",  # High quality square image
@@ -328,12 +412,6 @@ def generate_superhero_image(uploaded_image, first_name, accessory):
             
             return image_url
             
-    except openai.APIError as e:
-        st.error(f"⚠️ OpenAI API error: {e}")
-        return None
-    except openai.RateLimitError:
-        st.error("⚠️ Our hero factory is experiencing high demand. Please try again in a moment!")
-        return None
     except Exception as e:
         st.error(f"⚠️ Our hero factory is taking a short break — please try again! (Error: {e})")
         return None
@@ -470,14 +548,26 @@ def step_2_details():
         with col2:
             st.image(st.session_state.uploaded_image, caption="Your Photo", width=200)
     
-    # Input fields
-    first_name = st.text_input(
-        "First Name *",
-        value=st.session_state.first_name,
-        placeholder="e.g., Sarah",
-        help="Required - this will personalize your superhero",
-        key="first_name_input"
-    )
+    # Name input fields - First and Last name side by side
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        first_name = st.text_input(
+            "First Name *",
+            value=st.session_state.first_name,
+            placeholder="e.g., Sarah",
+            help="Required - this will appear on your action figure",
+            key="first_name_input"
+        )
+    
+    with col2:
+        last_name = st.text_input(
+            "Last Name *",
+            value=st.session_state.last_name,
+            placeholder="e.g., Johnson",
+            help="Required - this will appear on your action figure",
+            key="last_name_input"
+        )
     
     # Accessory selection
     accessory_options = [
@@ -497,11 +587,14 @@ def step_2_details():
     accessory = st.selectbox(
         "Choose Your Superhero Accessory (Optional)",
         options=accessory_options,
-        help="These will determine your superhero tools and weapons!",
+        help="These will be incorporated into your action figure packaging!",
         key="accessory_select"
     )
     
-    st.info("💡 **Tip:** Your accessory will be incorporated into your superhero image!")
+    if accessory == "None":
+        st.info("💡 **Tip:** Selecting an accessory will add themed items to your action figure packaging!")
+    else:
+        st.info(f"💡 **Selected:** Your action figure will include a {accessory.lower()} and related accessories!")
     
     # Navigation buttons
     col1, col2 = st.columns(2)
@@ -515,9 +608,12 @@ def step_2_details():
         if st.button("🚀 Generate My Superhero!", key="generate_button", type="primary"):
             if not first_name.strip():
                 st.error("⚠️ Please enter your first name to continue")
+            elif not last_name.strip():
+                st.error("⚠️ Please enter your last name to continue")
             else:
                 # Save to session state
                 st.session_state.first_name = first_name
+                st.session_state.last_name = last_name
                 st.session_state.accessory = accessory
                 st.session_state.step = 3
                 st.rerun()
@@ -528,44 +624,30 @@ def step_3_generate():
     """Step 3: Generate Superhero Image"""
     st.markdown('<div class="content-card">', unsafe_allow_html=True)
     
-    # COMMENTED OUT FOR INTERFACE DEVELOPMENT
     # Auto-generate if not already generated
-    # if st.session_state.generated_image_url is None:
-    #     st.markdown("### ⚡ Generating Your Superhero...")
-    #     
-    #     # Generate the image
-    #     image_url = generate_superhero_image(
-    #         st.session_state.uploaded_image,
-    #         st.session_state.first_name,
-    #         st.session_state.accessory
-    #     )
-    #     
-    #     if image_url:
-    #         st.session_state.generated_image_url = image_url
-    #         st.session_state.step = 4
-    #         st.rerun()
-    #     else:
-    #         # Error occurred
-    #         st.error("Generation failed. Please try again.")
-    #         if st.button("🔄 Try Again", key="retry_generation"):
-    #             st.rerun()
-    #         if st.button("⬅️ Back to Details", key="back_to_details_from_error"):
-    #             st.session_state.step = 2
-    #             st.rerun()
-    
-    # TEMPORARY: Skip to step 4 for interface testing
-    st.markdown("### ⚡ Generating Your Superhero...")
-    st.info("🎨 **Interface Testing Mode**: Image generation is disabled. Click below to preview the results page.")
-    
-    if st.button("⏭️ Skip to Results Page (Testing)", key="skip_to_results"):
-        # Use a placeholder image URL for testing
-        st.session_state.generated_image_url = "https://via.placeholder.com/1024x1024.png?text=Your+Superhero+Image"
-        st.session_state.step = 4
-        st.rerun()
-    
-    if st.button("⬅️ Back to Details", key="back_to_details_from_generate"):
-        st.session_state.step = 2
-        st.rerun()
+    if st.session_state.generated_image_url is None:
+        st.markdown("### ⚡ Generating Your Superhero...")
+        
+        # Generate the image
+        image_url = generate_superhero_image(
+            st.session_state.uploaded_image,
+            st.session_state.first_name,
+            st.session_state.last_name,
+            st.session_state.accessory
+        )
+        
+        if image_url:
+            st.session_state.generated_image_url = image_url
+            st.session_state.step = 4
+            st.rerun()
+        else:
+            # Error occurred
+            st.error("Generation failed. Please try again.")
+            if st.button("🔄 Try Again", key="retry_generation"):
+                st.rerun()
+            if st.button("⬅️ Back to Details", key="back_to_details_from_error"):
+                st.session_state.step = 2
+                st.rerun()
     
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -573,14 +655,14 @@ def step_4_share():
     """Step 4: Display and Share Results"""
     st.markdown('<div class="content-card">', unsafe_allow_html=True)
     
-    st.markdown(f"### 🎉 Congratulations, {st.session_state.first_name}!")
+    st.markdown(f"### 🎉 Congratulations, {st.session_state.first_name} {st.session_state.last_name}!")
     st.markdown("**You are now a superhero in the fight against cancer!**")
     
     # Display the generated image
     if st.session_state.generated_image_url:
         st.image(
             st.session_state.generated_image_url,
-            caption=f"{st.session_state.first_name} - Cancer Fighting Superhero",
+            caption=f"{st.session_state.first_name} {st.session_state.last_name} - Cancer Fighting Superhero",
             use_container_width=True
         )
         
@@ -616,6 +698,7 @@ def step_4_share():
             st.session_state.uploaded_image = None
             st.session_state.generated_image_url = None
             st.session_state.first_name = ""
+            st.session_state.last_name = ""
             st.session_state.accessory = "None"
             st.rerun()
         
@@ -632,22 +715,31 @@ def main():
     # Apply custom styling
     apply_custom_css()
     
-    # Initialize session state
+    # Initialize session state FIRST
     init_session_state()
     
-    # Setup OpenAI (always returns True in interface development mode)
-    api_configured = setup_openai()
+    # Setup OpenAI client if not already done
+    if st.session_state.openai_client is None:
+        st.session_state.openai_client = setup_openai()
     
     # Render header
     render_header()
     
-    # Show interface development mode notice
-    st.info("🎨 **Interface Development Mode Active**: You can design and test the full interface without an API key. Image generation is disabled.")
+    # Show status message based on API configuration
+    if st.session_state.openai_client is not None:
+        st.success("✅ **API Connected**: Ready to generate superhero images!")
+    else:
+        st.warning("⚠️ **API Not Configured**: Add your OpenAI API key to `.streamlit/secrets.toml` to enable image generation.")
+        st.code("""
+# Create .streamlit/secrets.toml with:
+[openai]
+api_key = "sk-your-api-key-here"
+        """)
     
     # Render step indicator
     render_step_indicator(st.session_state.step)
     
-    # Always show the interface - no API check blocking
+    # Route to appropriate step
     if st.session_state.step == 1:
         step_1_upload()
     elif st.session_state.step == 2:
