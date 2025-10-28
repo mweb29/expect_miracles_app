@@ -4,20 +4,24 @@ A Streamlit web application that transforms event attendees into superheroes fig
 
 ## About
 
-The Expect Miracles Superhero Generator is an interactive web app designed for the Expect Miracles Foundation's fundraising events. Attendees can upload their photos and transform into cancer-fighting superheroes using AI-powered image generation.
+The Expect Miracles Superhero Generator is an interactive web app designed for the Expect Miracles Foundation's fundraising events. Attendees can upload their photos and transform into cancer-fighting superhero action figures using AI-powered image generation.
 
 **Key Features:**
-- Mobile-first design optimized for event attendees
-- AI-powered superhero transformation using OpenAI DALL-E 3
-- Customizable superhero accessories
-- Social sharing capabilities (LinkedIn, Email)
-- Branded with Expect Miracles Foundation colors and styling
+- **Mobile-First Design:** Optimized for smartphones with responsive UI
+- **AI-Powered Transformation:** Uses OpenAI's gpt-image-1 model to create realistic action figure packaging
+- **4-Step Process:** Upload photo → Enter details → Generate → Share
+- **HEIC Support:** Native support for iPhone photos (HEIC/HEIF format)
+- **11 Accessory Options:** Golf club, tennis racket, stethoscope, basketball, camera, microphone, chef's hat, paintbrush, laptop, music instrument, or none
+- **Social Sharing:** LinkedIn, email, and direct download capabilities
+- **Branded Experience:** Navy blue gradient background with Expect Miracles Foundation colors
+- **Portrait Orientation:** Creates 1024x1536 action figure packaging images
 
 **Tech Stack:**
-- **Frontend Framework:** Streamlit
-- **AI Image Generation:** OpenAI DALL-E 3 API
-- **Image Processing:** Pillow (PIL)
+- **Frontend Framework:** Streamlit 1.28+
+- **AI Image Generation:** OpenAI gpt-image-1 API (image editing model)
+- **Image Processing:** Pillow (PIL) with HEIC support via pillow-heif
 - **Language:** Python 3.8+
+- **Additional Libraries:** python-dotenv, requests, qrcode
 
 ## Getting Started
 
@@ -84,10 +88,44 @@ expect_miracles_app/
 
 ## Usage
 
-1. **Upload Photo**: Attendees take a selfie or upload an existing photo
-2. **Enter Details**: Provide first name and select an optional superhero accessory
-3. **Generate**: AI creates a unique superhero transformation
-4. **Share**: Download and share the superhero image on social media
+### Step-by-Step Process
+
+1. **Step 1 - Upload Photo**:
+   - Take a selfie or upload an existing photo
+   - Supports JPG, PNG, and HEIC formats (iPhone photos work natively)
+   - Best results with clear headshots or upper-body photos with good lighting
+
+2. **Step 2 - Enter Details**:
+   - Provide your **first name** (required)
+   - Provide your **last name** (required)
+   - Select an optional superhero accessory from 11 options:
+     - None (no accessories)
+     - Golf Club (includes golf ball)
+     - Tennis Racket (includes tennis ball)
+     - Stethoscope (includes medical bag)
+     - Basketball (includes sports drink)
+     - Camera (includes photography equipment)
+     - Microphone (includes speaker)
+     - Chef's Hat (includes cooking utensils)
+     - Artist's Paintbrush (includes art palette)
+     - Laptop (includes tech gadgets)
+     - Music Instrument (includes headphones)
+
+3. **Step 3 - Generate**:
+   - AI automatically generates your superhero action figure
+   - Takes approximately 30-60 seconds
+   - Creates a realistic action figure packaging with:
+     - Your exact facial likeness
+     - Your actual clothing from the photo
+     - "I'M TAKING ACTION AGAINST CANCER" message
+     - Your name prominently displayed
+     - Selected accessories in packaging
+
+4. **Step 4 - Share**:
+   - Download your superhero image
+   - Share to LinkedIn with pre-written message
+   - Send via email
+   - Create another superhero (resets the process)
 
 ## QR Code Generator for Events
 
@@ -127,26 +165,132 @@ This will create three QR code sizes:
 
 ### API Settings
 
-The app uses OpenAI's DALL-E 3 model with the following default settings:
-- **Model:** dall-e-3
-- **Size:** 1024x1024 pixels
-- **Quality:** standard (can be upgraded to "hd" for better quality)
+The app uses OpenAI's **gpt-image-1** model with the following settings:
+- **Model:** gpt-image-1 (image editing model)
+- **API Endpoint:** `client.images.edit()`
+- **Size:** 1024x1536 pixels (portrait orientation for action figure packaging)
+- **Input Format:** PNG (automatically converted from uploaded images)
+- **Generation Time:** Approximately 30-60 seconds per image
+
+**Important Notes:**
+- The app uses the `images.edit()` endpoint, not `images.generate()`
+- Requires the uploaded photo as input to create personalized action figures
+- Automatically converts HEIC images to PNG for API compatibility
+- Includes detailed prompt engineering for consistent action figure packaging style
 
 ### Branding
 
-Brand colors (customizable in `app.py`):
-- **Primary Navy:** #1a237e
-- **Gold:** #ffd700
-- **Accent Blue:** #00d4ff
+Brand colors (defined in `app.py` CSS):
+- **Primary Navy:** #1a237e (header text, buttons)
+- **Blue Gradient:** #1e3a8a → #3b82f6 → #60a5fa (background)
+- **Gold:** #ffd700 (subtitle, download buttons)
+- **White:** #ffffff (card backgrounds, footer text)
+- **Accent Cyan:** #00d4ff (step indicators)
+
+### Prompt Engineering
+
+The app uses a sophisticated prompt that:
+- Maintains exact facial likeness from the uploaded photo
+- Keeps original clothing from the reference image
+- Creates realistic action figure packaging aesthetic
+- Includes "I'M TAKING ACTION AGAINST CANCER" message
+- Adds user's name to the packaging
+- Incorporates selected accessories with themed props
+- Emulates premium Hasbro/Marvel Legends collectible style
+
+## Technical Implementation
+
+### Image Processing Pipeline
+
+1. **Upload Handling:**
+   - Accepts JPG, PNG, HEIC/HEIF formats
+   - Uses pillow-heif for HEIC support
+   - Converts all images to RGB mode (removes alpha channel)
+   - Stores in Streamlit session state (temporary, not persisted)
+
+2. **API Integration:**
+   - Converts PIL Image to BytesIO stream
+   - Saves as PNG format with `.name` attribute for API recognition
+   - Sends to OpenAI `images.edit()` endpoint
+   - Handles both URL and base64 responses
+
+3. **Error Handling:**
+   - Comprehensive try-catch blocks
+   - Debug information display for troubleshooting
+   - Detailed error messages with traceback
+   - Retry options on failure
+
+4. **Session State Management:**
+   - Tracks current step (1-4)
+   - Stores uploaded image, generated image URL, and user details
+   - Persists OpenAI client instance
+   - Allows multiple generations in same session
+
+### UI/UX Design
+
+- **Mobile-First:** Optimized for event attendees using smartphones
+- **Progress Indicators:** 4-step visual progress tracker
+- **Responsive Cards:** White content cards on blue gradient background
+- **Custom CSS:** Extensive styling for branded experience
+- **Auto-Navigation:** Automatically proceeds through generation steps
+- **Accessibility:** Clear instructions, helpful tips, and status messages
 
 ## Security Notes
 
-- Never commit `.streamlit/secrets.toml` to git (it's in `.gitignore`)
-- Use environment variables or Streamlit secrets for API keys
-- The app doesn't store uploaded photos permanently (they're in session state only)
+- **API Key Protection:**
+  - Never commit `.streamlit/secrets.toml` to git (included in `.gitignore`)
+  - Use Streamlit secrets or environment variables for API keys
+  - Keys are validated at startup (must start with 'sk-')
+
+- **Data Privacy:**
+  - Uploaded photos stored only in session state (temporary memory)
+  - No photos are saved to disk or database
+  - Generated images are temporary URLs from OpenAI
+  - Each session is isolated and cleaned on reset
+
+- **Production Deployment:**
+  - Configure secrets in Streamlit Cloud settings
+  - Monitor API usage and costs in OpenAI dashboard
+  - Test thoroughly with various image types before event
+  - Consider rate limiting for large events (350-500 users)
+
+## Troubleshooting
+
+### Common Issues
+
+**"API key not found"**
+- Ensure `.streamlit/secrets.toml` exists with your OpenAI API key
+- Check that the key starts with 'sk-'
+- Verify file is in the correct location
+
+**"HEIC not supported"**
+- Install pillow-heif: `pip install pillow-heif`
+- Alternative: Convert HEIC to JPG before uploading
+
+**"Image generation failed"**
+- Check OpenAI API status and account credits
+- Verify image is under 10MB
+- Ensure stable internet connection
+- Review error details in debug output
+
+**Slow performance at events**
+- Each generation takes 30-60 seconds (expected)
+- Consider multiple deployment instances for 350+ simultaneous users
+- Test bandwidth at event venue beforehand
+- Have backup QR codes ready
 
 ## Acknowledgments
 
 - Built with [Streamlit](https://streamlit.io/)
-- AI image generation powered by [OpenAI DALL-E 3](https://openai.com/dall-e-3)
+- AI image generation powered by [OpenAI gpt-image-1](https://openai.com/api)
+- HEIC support via [pillow-heif](https://github.com/bigcat88/pillow_heif)
+- QR code generation using [python-qrcode](https://github.com/lincolnloop/python-qrcode)
 - Created for the Expect Miracles Foundation
+
+## License
+
+© 2025 Expect Miracles Foundation - All Rights Reserved
+
+## Support
+
+For questions, issues, or feature requests, please open an issue on GitHub.
