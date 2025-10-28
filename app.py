@@ -16,6 +16,7 @@ from io import BytesIO
 from PIL import Image
 import os
 import tempfile
+import requests
 
 # Import HEIC support
 try:
@@ -754,35 +755,85 @@ def step_4_share():
         # Action buttons
         st.markdown("### 📤 Share Your Superhero")
         
-        # Download button (note: direct download from URL requires additional handling)
-        st.markdown(f"[📥 Download Image]({st.session_state.generated_image_url})")
+        # Download button - Handle both URL and base64 data
+        try:
+            # Check if we need to prepare the image for download
+            if 'downloaded_image' not in st.session_state:
+                image_data = None
+                
+                # Check if it's a data URL (base64)
+                if st.session_state.generated_image_url.startswith('data:image'):
+                    # Extract base64 data from data URL
+                    # Format: data:image/png;base64,ACTUALBASE64DATA
+                    base64_data = st.session_state.generated_image_url.split(',', 1)[1]
+                    image_data = base64.b64decode(base64_data)
+                    st.session_state.downloaded_image = image_data
+                else:
+                    # It's a regular URL - download it
+                    with st.spinner("Preparing download..."):
+                        response = requests.get(st.session_state.generated_image_url, timeout=10)
+                        response.raise_for_status()
+                        st.session_state.downloaded_image = response.content
+            
+            # Create download button with the prepared image data
+            st.download_button(
+                label="📥 Download Your Action Figure",
+                data=st.session_state.downloaded_image,
+                file_name=f"{st.session_state.first_name}_{st.session_state.last_name}_action_figure.png",
+                mime="image/png",
+                key="download_image",
+                use_container_width=True
+            )
+            
+        except Exception as e:
+            st.error(f"Unable to prepare download: {str(e)[:100]}")
+            # Fallback: right-click to save
+            st.markdown("**Alternative Download Method:**")
+            st.markdown("Right-click the image above and select 'Save Image As...'")
         
-        # LinkedIn share
-        linkedin_text = f"I just became a superhero in the fight against cancer with Expect Miracles Foundation! Join me in taking action against cancer. #ExpectMiracles #CancerResearch #TakeAction"
-        linkedin_url = f"https://www.linkedin.com/sharing/share-offsite/?url={st.session_state.generated_image_url}"
+        st.markdown("---")
         
-        if st.button("📱 Share to LinkedIn", key="linkedin_share"):
-            st.markdown(f"[Click here to share on LinkedIn]({linkedin_url})")
+        # Social sharing instructions
+        st.markdown("### 📱 Share on Social Media")
         
-        # Email option
-        email_subject = "I'm a Superhero Fighting Cancer!"
-        email_body = f"Check out my superhero transformation with Expect Miracles Foundation! {st.session_state.generated_image_url}"
-        mailto_link = f"mailto:?subject={email_subject}&body={email_body}"
+        st.info("💡 **How to Share:**\n1. Download your action figure image using the button above\n2. Share it on your favorite social media platform\n3. Use the hashtags: #ExpectMiracles #CancerResearch #TakeAction")
         
-        if st.button("📧 Email This Image", key="email_share"):
-            st.markdown(f"[Click here to email]({mailto_link})")
+        # LinkedIn sharing instructions
+        with st.expander("📱 Share on LinkedIn"):
+            st.markdown("""
+            **To share on LinkedIn:**
+            1. Click the download button above
+            2. Go to [LinkedIn.com](https://www.linkedin.com)
+            3. Click "Start a post"
+            4. Upload your downloaded image
+            5. Add this message:
+            
+            *"I just became a superhero in the fight against cancer with Expect Miracles Foundation! Join me in taking action against cancer. #ExpectMiracles #CancerResearch #TakeAction"*
+            """)
+        
+        # Email sharing
+        with st.expander("📧 Share via Email"):
+            st.markdown("""
+            **To share via email:**
+            1. Download your action figure image
+            2. Compose a new email
+            3. Attach the downloaded image
+            4. Share your story about taking action against cancer!
+            """)
         
         st.markdown("---")
         
         # Create another
         if st.button("🔄 Create Another Superhero", key="create_another"):
-            # Reset session state
+            # Reset session state including downloaded image
             st.session_state.step = 1
             st.session_state.uploaded_image = None
             st.session_state.generated_image_url = None
             st.session_state.first_name = ""
             st.session_state.last_name = ""
             st.session_state.accessory = "None"
+            if 'downloaded_image' in st.session_state:
+                del st.session_state.downloaded_image
             st.rerun()
         
         st.success("✨ Thank you for joining the fight against cancer!")
