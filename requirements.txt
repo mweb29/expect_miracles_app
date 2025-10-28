@@ -3,3 +3,9 @@ openai>=1.12.0
 Pillow>=10.0.0
 python-dotenv>=1.0.0
 qrcode[pil]>=7.4.2
+
+# HEIC/HEIF support for iPhone images
+pillow-heif>=0.13.0
+
+# HTTP requests for downloading images
+requests>=2.31.0

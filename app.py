@@ -5,7 +5,7 @@ A Streamlit app that transforms event attendees into superheroes fighting cancer
 Built for live fundraising events with 350-500 attendees accessing via QR code.
 
 Author: Expect Miracles Foundation
-Tech Stack: Streamlit + OpenAI DALL-E 3
+Tech Stack: Streamlit + OpenAI gpt-image-1
 """
 
 import streamlit as st
@@ -16,6 +16,14 @@ from io import BytesIO
 from PIL import Image
 import os
 import tempfile
+
+# Import HEIC support
+try:
+    from pillow_heif import register_heif_opener
+    register_heif_opener()
+    HEIC_SUPPORTED = True
+except ImportError:
+    HEIC_SUPPORTED = False
 
 # ============================================================================
 # PAGE CONFIGURATION - Must be the first Streamlit command
@@ -296,7 +304,7 @@ def save_generated_image(image_url, first_name):
 # ============================================================================
 def generate_superhero_image(uploaded_image, first_name, last_name, accessory):
     """
-    Generate superhero action figure image using OpenAI DALL-E 3
+    Generate superhero action figure image using OpenAI gpt-image-1
     
     Parameters:
     - uploaded_image: PIL Image object
@@ -320,92 +328,112 @@ def generate_superhero_image(uploaded_image, first_name, last_name, accessory):
     
     # Build accessories text based on user selection
     if accessory == "None":
-        accessories_text = ""
-        accessories_instruction = "- No additional accessories included in the blister pack"
+        accessories_text = "No additional accessories are needed - just the figure in confident heroic pose."
     elif accessory == "Golf Club":
-        accessories_text = "golf club and golf ball"
-        accessories_instruction = f"- Display these accessories next to the figure in the blister pack: {accessories_text}"
+        accessories_text = "Include two accessories: a golf club and a golf ball — both neatly positioned in the packaging alongside the figure."
     elif accessory == "Tennis Racket":
-        accessories_text = "tennis racket and tennis ball"
-        accessories_instruction = f"- Display these accessories next to the figure in the blister pack: {accessories_text}"
+        accessories_text = "Include two accessories: a tennis racket and a tennis ball — both neatly positioned in the packaging alongside the figure."
     elif accessory == "Stethoscope":
-        accessories_text = "stethoscope and medical bag"
-        accessories_instruction = f"- Display these accessories next to the figure in the blister pack: {accessories_text}"
+        accessories_text = "Include two accessories: a stethoscope and a medical bag — both neatly positioned in the packaging alongside the figure."
     elif accessory == "Basketball":
-        accessories_text = "basketball and sports drink"
-        accessories_instruction = f"- Display these accessories next to the figure in the blister pack: {accessories_text}"
+        accessories_text = "Include two accessories: a basketball and a sports drink — both neatly positioned in the packaging alongside the figure."
     elif accessory == "Camera":
-        accessories_text = "camera and photography equipment"
-        accessories_instruction = f"- Display these accessories next to the figure in the blister pack: {accessories_text}"
+        accessories_text = "Include two accessories: a professional camera and photography equipment — both neatly positioned in the packaging alongside the figure."
     elif accessory == "Microphone":
-        accessories_text = "microphone and speaker"
-        accessories_instruction = f"- Display these accessories next to the figure in the blister pack: {accessories_text}"
+        accessories_text = "Include two accessories: a microphone and a speaker — both neatly positioned in the packaging alongside the figure."
     elif accessory == "Chef's Hat":
-        accessories_text = "chef's hat and cooking utensils"
-        accessories_instruction = f"- Display these accessories next to the figure in the blister pack: {accessories_text}"
+        accessories_text = "Include two accessories: a chef's hat and cooking utensils — both neatly positioned in the packaging alongside the figure."
     elif accessory == "Artist's Paintbrush":
-        accessories_text = "paintbrush and art palette"
-        accessories_instruction = f"- Display these accessories next to the figure in the blister pack: {accessories_text}"
+        accessories_text = "Include two accessories: a paintbrush and an art palette — both neatly positioned in the packaging alongside the figure."
     elif accessory == "Laptop":
-        accessories_text = "laptop and tech gadgets"
-        accessories_instruction = f"- Display these accessories next to the figure in the blister pack: {accessories_text}"
+        accessories_text = "Include two accessories: a laptop and tech gadgets — both neatly positioned in the packaging alongside the figure."
     elif accessory == "Music Instrument":
-        accessories_text = "musical instrument and headphones"
-        accessories_instruction = f"- Display these accessories next to the figure in the blister pack: {accessories_text}"
+        accessories_text = "Include two accessories: a musical instrument and headphones — both neatly positioned in the packaging alongside the figure."
     else:
-        accessories_text = f"{accessory.lower()} and related equipment"
-        accessories_instruction = f"- Display these accessories next to the figure in the blister pack: {accessories_text}"
+        accessories_text = f"Include accessories: {accessory.lower()} — neatly positioned in the packaging alongside the figure."
     
-    # Use the vintage-style prompt with Expect Miracles color scheme
-    prompt = f"""Create a vintage-style retail action figure package design based on the uploaded photo. This is for a cancer charity event with the theme "Taking Action Against Cancer."
+    # Create the prompt for gpt-image-1
+    prompt = f"""Create a realistic, store-ready action figure of a person named {full_name}, based on the uploaded reference image. 
+The final result should look like a premium Hasbro or Marvel Legends collectible toy photographed for retail packaging.
 
-CRITICAL REQUIREMENTS:
-- The action figure MUST accurately represent the person in the uploaded photo - matching their gender, appearance, facial features, hair color and style, and clothing
-- The package should face directly forward (front view), not at an angle
-- Style: Classic 1970s-80s action figure packaging (similar to vintage Kenner or Mego toys) - simple, nostalgic, retro aesthetic
-- The figure should look realistic and lifelike, representing the actual person
-- Only include text that is specifically requested below - no other words or phrases
+Packaging Design:
+- Vertical portrait orientation, resembling authentic toy box packaging.
+- {full_name}'s figure should appear centered inside a clear plastic blister on a sturdy cardboard backing.
+- Prominently display the phrase "I'M TAKING ACTION AGAINST CANCER" near the top or middle of the box in bold, inspiring, heroic typography.
+- Include the name "{full_name}" clearly visible on the packaging.
+- Include stylish brand-like markings and subtle charity branding (without logos).
+- The background should be vibrant and motivational — glowing gradients, heroic energy bursts, or metallic blues and golds that evoke hope and strength.
 
-PACKAGING DESIGN:
-- Retro blister pack style with clear plastic bubble showing the figure
-- Simple cardboard backing with rounded corners
-- Color palette: Navy blue and gold/yellow accents (Expect Miracles brand colors) with warm vintage tones
-- Clean, straightforward design - not cluttered or busy
-- Front-facing orientation (viewer looking directly at the front of the package)
+Action Figure Details:
+- Maintain {full_name}'s exact facial likeness from the uploaded photo.
+- Keep the person in their actual clothing from the photo (do not change outfits).
+- Give them a confident, heroic stance with strong lighting and realistic reflections.
+- Ensure the figure accurately represents the person's appearance, gender, hair, and style from the reference image.
+- {accessories_text}
+- Ensure realistic lighting, materials, and shadows so the scene looks like a professional product photo.
 
-PACKAGING TEXT (ONLY THESE):
-- Name at top: "{full_name}"
-- Main phrase somewhere on package: "I'M TAKING ACTION AGAINST CANCER"
-- Small label: "ACTION FIGURE"
-- No other text, descriptions, warnings, or fine print
-
-INCLUDED ACCESSORIES:
-{accessories_instruction}
-
-DESIGN SPECIFICATIONS:
-- Vintage toy aesthetic - simple and iconic
-- The figure should be dressed in casual/normal clothing (as shown in the photo)
-- Bold, inspiring but tasteful presentation
-- Do NOT depict cancer cells or medical imagery
-- Professional product photography lighting
-- Make it look like a collectible from a classic toy line
-
-Create a nostalgic, store-ready design that captures the charm of vintage action figure packaging with navy blue and gold color scheme."""
+Overall Style:
+- Photorealistic finish with professional toy photography quality.
+- Clean edges, clear focus, and rich textures.
+- Ready-for-market presentation — bold, inspiring, and polished.
+- The figure should look like a collectible action figure of a real person, not a fictional character."""
     
     try:
+        # Convert PIL Image to bytes for upload with proper format
+        import io
+        img_byte_arr = io.BytesIO()
+        
+        # Convert to RGB if needed (removes alpha channel)
+        if uploaded_image.mode == 'RGBA':
+            uploaded_image = uploaded_image.convert('RGB')
+        
+        # Save as PNG
+        uploaded_image.save(img_byte_arr, format='PNG')
+        img_byte_arr.seek(0)
+        
+        # Give the BytesIO object a name attribute so the API recognizes it as a PNG file
+        img_byte_arr.name = "uploaded_image.png"
+        
         # Show progress to user
-        with st.spinner("🦸 Transforming you into a vintage action figure... This may take 30-60 seconds..."):
-            # Call OpenAI DALL-E 3 API
-            response = client.images.generate(
-                model="dall-e-3",
+        with st.spinner("🦸 Transforming you into a superhero action figure... This may take 30-60 seconds..."):
+            # Call OpenAI gpt-image-1 API with image editing
+            response = client.images.edit(
+                model="gpt-image-1",
+                image=img_byte_arr,  # The uploaded image as bytes with .name attribute
                 prompt=prompt,
-                size="1024x1024",  # High quality square image
-                quality="standard",  # Can use "hd" for better quality but slower
-                n=1,
+                size="1024x1536",  # Portrait orientation for packaging (supported by gpt-image-1)
+                n=1
             )
             
-            # Extract image URL from response
-            image_url = response.data[0].url
+            # Debug: Log the response structure
+            st.write("### 🔍 Debug: API Response Structure")
+            st.write(f"Response type: {type(response)}")
+            st.write(f"Response data length: {len(response.data)}")
+            st.write(f"First data item type: {type(response.data[0])}")
+            
+            # Check what attributes are available
+            available_attrs = [attr for attr in dir(response.data[0]) if not attr.startswith('_')]
+            st.write(f"Available attributes: {available_attrs}")
+            
+            # Try to get the image in various formats
+            image_url = None
+            
+            if hasattr(response.data[0], 'url') and response.data[0].url:
+                image_url = response.data[0].url
+                st.success(f"✅ Got URL (length: {len(image_url)} chars)")
+            elif hasattr(response.data[0], 'b64_json') and response.data[0].b64_json:
+                # Convert base64 to data URL
+                image_base64 = response.data[0].b64_json
+                image_url = f"data:image/png;base64,{image_base64}"
+                st.success(f"✅ Got base64 data (length: {len(image_base64)} chars)")
+            elif hasattr(response.data[0], 'revised_prompt'):
+                st.info(f"📝 Revised prompt: {response.data[0].revised_prompt}")
+            
+            if not image_url:
+                st.error("❌ Could not extract image from response")
+                st.write("Response data[0] contents:")
+                st.json(response.data[0].model_dump() if hasattr(response.data[0], 'model_dump') else str(response.data[0]))
+                return None
             
             # Save image reference
             save_generated_image(image_url, first_name)
@@ -413,7 +441,23 @@ Create a nostalgic, store-ready design that captures the charm of vintage action
             return image_url
             
     except Exception as e:
-        st.error(f"⚠️ Our hero factory is taking a short break — please try again! (Error: {e})")
+        st.error(f"⚠️ Image Generation Error: {str(e)}")
+        
+        # Show full error details
+        st.markdown("### 🔍 Error Details:")
+        import traceback
+        error_details = traceback.format_exc()
+        st.code(error_details, language="python")
+        
+        # Show debugging info
+        st.markdown("### 🐛 Debug Information:")
+        st.write(f"- First Name: {first_name}")
+        st.write(f"- Last Name: {last_name}")
+        st.write(f"- Full Name: {full_name}")
+        st.write(f"- Accessory: {accessory}")
+        st.write(f"- Image Mode: {uploaded_image.mode}")
+        st.write(f"- Image Size: {uploaded_image.size}")
+        
         return None
 
 # ============================================================================
@@ -510,26 +554,47 @@ def step_1_upload():
     st.markdown("### 📸 Step 1: Upload Your Photo")
     st.markdown("Choose a clear photo of yourself for the best superhero transformation")
     
+    # Add helpful tips for best results
+    st.info("💡 **Best Results:** Use a clear headshot or upper-body photo with good lighting and a plain background. Professional headshots work great!")
+    
+    # Determine accepted file types based on HEIC support
+    if HEIC_SUPPORTED:
+        file_types = ['png', 'jpg', 'jpeg', 'heic', 'heif']
+        help_text = "JPG, PNG, HEIC up to 10MB - iPhone photos supported!"
+    else:
+        file_types = ['png', 'jpg', 'jpeg']
+        help_text = "JPG, PNG up to 10MB"
+        st.warning("⚠️ HEIC support not available. iPhone users: Convert HEIC to JPG before uploading, or the app will attempt automatic conversion.")
+    
     # File uploader with camera support for mobile
     uploaded_file = st.file_uploader(
         "Take a photo or upload from your device",
-        type=['png', 'jpg', 'jpeg'],
-        help="JPG, PNG up to 10MB",
+        type=file_types,
+        help=help_text,
         key="photo_upload"
     )
     
     if uploaded_file is not None:
-        # Display the uploaded image
-        image = Image.open(uploaded_file)
-        st.image(image, caption="Your Photo", use_container_width=True)
-        
-        # Store in session state
-        st.session_state.uploaded_image = image
-        
-        # Button to proceed
-        if st.button("✅ Continue to Personal Details", key="continue_to_step2"):
-            st.session_state.step = 2
-            st.rerun()
+        try:
+            # Display the uploaded image
+            image = Image.open(uploaded_file)
+            
+            # Convert HEIC to RGB if needed
+            if image.mode not in ('RGB', 'RGBA'):
+                image = image.convert('RGB')
+            
+            st.image(image, caption="Your Photo", width='stretch')
+            
+            # Store in session state
+            st.session_state.uploaded_image = image
+            
+            # Button to proceed
+            if st.button("✅ Continue to Personal Details", key="continue_to_step2"):
+                st.session_state.step = 2
+                st.rerun()
+        except Exception as e:
+            st.error(f"⚠️ Error loading image: {e}")
+            st.info("💡 If you're uploading a HEIC file from iPhone, try converting it to JPG first.")
     else:
         st.info("👆 Tap above to take a photo or select one from your device")
     
@@ -629,25 +694,43 @@ def step_3_generate():
         st.markdown("### ⚡ Generating Your Superhero...")
         
         # Generate the image
-        image_url = generate_superhero_image(
-            st.session_state.uploaded_image,
-            st.session_state.first_name,
-            st.session_state.last_name,
-            st.session_state.accessory
-        )
-        
-        if image_url:
-            st.session_state.generated_image_url = image_url
-            st.session_state.step = 4
-            st.rerun()
-        else:
-            # Error occurred
-            st.error("Generation failed. Please try again.")
-            if st.button("🔄 Try Again", key="retry_generation"):
+        try:
+            image_url = generate_superhero_image(
+                st.session_state.uploaded_image,
+                st.session_state.first_name,
+                st.session_state.last_name,
+                st.session_state.accessory
+            )
+            
+            if image_url:
+                st.session_state.generated_image_url = image_url
+                st.session_state.step = 4
                 st.rerun()
-            if st.button("⬅️ Back to Details", key="back_to_details_from_error"):
-                st.session_state.step = 2
-                st.rerun()
+            else:
+                # Error occurred - the error details should have been shown
+                st.error("❌ Generation returned no image. Check error details above.")
+                
+                col1, col2 = st.columns(2)
+                with col1:
+                    if st.button("🔄 Try Again", key="retry_generation"):
+                        st.rerun()
+                with col2:
+                    if st.button("⬅️ Back to Details", key="back_to_details_from_error"):
+                        st.session_state.step = 2
+                        st.rerun()
+        except Exception as e:
+            st.error(f"❌ Critical error during generation: {e}")
+            import traceback
+            st.code(traceback.format_exc())
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.button("🔄 Try Again", key="retry_generation_exception"):
+                    st.rerun()
+            with col2:
+                if st.button("⬅️ Back to Details", key="back_to_details_exception"):
+                    st.session_state.step = 2
+                    st.rerun()
     
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -663,7 +746,7 @@ def step_4_share():
         st.image(
             st.session_state.generated_image_url,
             caption=f"{st.session_state.first_name} {st.session_state.last_name} - Cancer Fighting Superhero",
-            use_container_width=True
+            width='stretch'
         )
         
         st.markdown("---")
