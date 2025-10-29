@@ -242,32 +242,22 @@ def init_session_state():
 def setup_openai():
     """Configure OpenAI API with secrets management"""
     try:
-        # Debug: Check what's available
-        api_key = None
-        
-        # Try to get from Streamlit secrets
+        # Get API key from secrets or environment
         if hasattr(st, 'secrets') and 'openai' in st.secrets:
             api_key = st.secrets['openai']['api_key']
-            st.info(f"🔍 Found API key in secrets (starts with: {api_key[:10]}...)")
-        # Try environment variable
         elif os.getenv('OPENAI_API_KEY'):
             api_key = os.getenv('OPENAI_API_KEY')
-            st.info(f"🔍 Found API key in environment (starts with: {api_key[:10]}...)")
         else:
-            st.error("❌ No API key found in secrets.toml or environment variables")
             return None
         
         if not api_key or not api_key.startswith('sk-'):
-            st.error(f"❌ Invalid API key format. Key should start with 'sk-' but got: {api_key[:10] if api_key else 'None'}...")
             return None
         
         # Create OpenAI client with minimal configuration
         client = OpenAI(api_key=api_key)
-        st.success("✅ OpenAI client created successfully")
         return client
         
     except Exception as e:
-        st.error(f"⚠️ Error configuring OpenAI: {str(e)}")
         return None
 
 # ============================================================================
@@ -400,40 +390,24 @@ Overall Style:
             # Call OpenAI gpt-image-1 API with image editing
             response = client.images.edit(
                 model="gpt-image-1",
-                image=img_byte_arr,  # The uploaded image as bytes with .name attribute
+                image=img_byte_arr,
                 prompt=prompt,
-                size="1024x1536",  # Portrait orientation for packaging (supported by gpt-image-1)
+                size="1024x1536",
                 n=1
             )
             
-            # Debug: Log the response structure
-            st.write("### 🔍 Debug: API Response Structure")
-            st.write(f"Response type: {type(response)}")
-            st.write(f"Response data length: {len(response.data)}")
-            st.write(f"First data item type: {type(response.data[0])}")
-            
-            # Check what attributes are available
-            available_attrs = [attr for attr in dir(response.data[0]) if not attr.startswith('_')]
-            st.write(f"Available attributes: {available_attrs}")
-            
-            # Try to get the image in various formats
+            # Extract image from response
             image_url = None
             
             if hasattr(response.data[0], 'url') and response.data[0].url:
                 image_url = response.data[0].url
-                st.success(f"✅ Got URL (length: {len(image_url)} chars)")
             elif hasattr(response.data[0], 'b64_json') and response.data[0].b64_json:
                 # Convert base64 to data URL
                 image_base64 = response.data[0].b64_json
                 image_url = f"data:image/png;base64,{image_base64}"
-                st.success(f"✅ Got base64 data (length: {len(image_base64)} chars)")
-            elif hasattr(response.data[0], 'revised_prompt'):
-                st.info(f"📝 Revised prompt: {response.data[0].revised_prompt}")
             
             if not image_url:
                 st.error("❌ Could not extract image from response")
-                st.write("Response data[0] contents:")
-                st.json(response.data[0].model_dump() if hasattr(response.data[0], 'model_dump') else str(response.data[0]))
                 return None
             
             # Save image reference
@@ -859,16 +833,11 @@ def main():
     # Render header
     render_header()
     
-    # Show status message based on API configuration
+    # Show status message based on API configuration (simpler version)
     if st.session_state.openai_client is not None:
         st.success("✅ **API Connected**: Ready to generate superhero images!")
     else:
-        st.warning("⚠️ **API Not Configured**: Add your OpenAI API key to `.streamlit/secrets.toml` to enable image generation.")
-        st.code("""
-# Create .streamlit/secrets.toml with:
-[openai]
-api_key = "sk-your-api-key-here"
-        """)
+        st.error("⚠️ **API Not Configured**: Please check your OpenAI API key configuration.")
     
     # Render step indicator
     render_step_indicator(st.session_state.step)
