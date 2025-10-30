@@ -11,9 +11,6 @@ Requirements:
 """
 
 import qrcode
-from qrcode.image.styledpil import StyledPilImage
-from qrcode.image.styles.moduledrawers import RoundedModuleDrawer
-from qrcode.image.styles.colormasks import SolidFillColorMask
 
 def generate_qr_code(url, filename="expect_miracles_qr.png", size="standard"):
     """
@@ -25,10 +22,10 @@ def generate_qr_code(url, filename="expect_miracles_qr.png", size="standard"):
         size (str): 'standard', 'large', or 'poster'
     """
 
-    # Expect Miracles brand colors
-    NAVY = "#1a237e"
-    GOLD = "#ffd700"
-    WHITE = "#ffffff"
+    # Expect Miracles brand colors (from logo)
+    DEEP_BLUE = "#003087"      # Primary blue from logo
+    PURPLE = "#7b2c85"         # Purple/magenta accent from logo
+    WHITE = "#ffffff"          # Background
 
     # Set box size based on desired output
     size_configs = {
@@ -51,14 +48,11 @@ def generate_qr_code(url, filename="expect_miracles_qr.png", size="standard"):
     qr.add_data(url)
     qr.make(fit=True)
 
-    # Create image with brand colors
+    # Create image with brand colors (using deep blue for QR pattern)
+    # Note: Using standard QR code for better compatibility and scannability
     img = qr.make_image(
-        image_factory=StyledPilImage,
-        module_drawer=RoundedModuleDrawer(),  # Rounded corners for modern look
-        color_mask=SolidFillColorMask(
-            back_color=WHITE,
-            front_color=NAVY
-        )
+        fill_color=DEEP_BLUE,  # QR code pattern in deep blue
+        back_color=WHITE       # White background
     )
 
     # Save the image
@@ -103,7 +97,7 @@ if __name__ == "__main__":
 
     # Replace with your actual Streamlit Cloud URL
     # Example: "https://superhero-expectmiracles.streamlit.app"
-    APP_URL = "https://your-app-name.streamlit.app"
+    APP_URL = "https://expect-miracles-event.streamlit.app"
 
     # ============================================================================
 
