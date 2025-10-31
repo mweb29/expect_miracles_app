@@ -727,18 +727,18 @@ def step_4_share():
         st.markdown("---")
         
         # Action buttons
-        st.markdown("### 📤 Share Your Superhero")
+        st.markdown("### 📤 Save & Share Your Superhero")
         
-        # Download button - Handle both URL and base64 data
+        # MOBILE-FRIENDLY DOWNLOAD SECTION
+        # Prepare image data for both download methods
         try:
-            # Check if we need to prepare the image for download
+            # Prepare image data if not already done
             if 'downloaded_image' not in st.session_state:
                 image_data = None
                 
                 # Check if it's a data URL (base64)
                 if st.session_state.generated_image_url.startswith('data:image'):
                     # Extract base64 data from data URL
-                    # Format: data:image/png;base64,ACTUALBASE64DATA
                     base64_data = st.session_state.generated_image_url.split(',', 1)[1]
                     image_data = base64.b64decode(base64_data)
                     st.session_state.downloaded_image = image_data
@@ -749,21 +749,64 @@ def step_4_share():
                         response.raise_for_status()
                         st.session_state.downloaded_image = response.content
             
-            # Create download button with the prepared image data
+            # Convert image data to base64 for mobile display
+            img_base64 = base64.b64encode(st.session_state.downloaded_image).decode()
+            
+            # METHOD 1: Standard download button (works on desktop and some mobile browsers)
             st.download_button(
-                label="📥 Download Your Action Figure",
+                label="💾 Download Image (Desktop/Android)",
                 data=st.session_state.downloaded_image,
-                file_name=f"{st.session_state.first_name}_{st.session_state.last_name}_action_figure.png",
+                file_name=f"{st.session_state.first_name}_{st.session_state.last_name}_superhero.png",
                 mime="image/png",
                 key="download_image",
                 use_container_width=True
             )
             
+            # METHOD 2: iPhone-specific instructions (most reliable for iOS)
+            st.markdown("---")
+            st.markdown("### 📱 **For iPhone/iPad Users:**")
+            st.info(
+                """
+                **To save on your iPhone:**
+                1. **TAP AND HOLD** (long press) on the image above for 2-3 seconds
+                2. A menu will appear - select **"Add to Photos"** or **"Save Image"**
+                3. Your superhero image will be saved to your Photos app! 📸
+                
+                ✅ This is the most reliable method for iPhones!
+                """
+            )
+            
+            # METHOD 3: Alternative HTML link for iOS (backup method)
+            st.markdown(
+                f"""
+                <div style="margin: 20px 0;">
+                    <a href="data:image/png;base64,{img_base64}" download="{st.session_state.first_name}_{st.session_state.last_name}_superhero.png" style="text-decoration: none;">
+                        <button style="
+                            background: linear-gradient(90deg, #ffd700 0%, #ffed4e 100%);
+                            color: #1a237e;
+                            padding: 15px 30px;
+                            border: none;
+                            border-radius: 25px;
+                            font-size: 18px;
+                            font-weight: bold;
+                            width: 100%;
+                            cursor: pointer;
+                            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                        ">
+                            📥 Alternative Download Link (iOS Backup)
+                        </button>
+                    </a>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+            
+            st.caption("💡 **Tip:** If the download buttons don't work on your device, use the 'tap and hold' method above - it works on all iPhones!")
+            
         except Exception as e:
-            st.error(f"Unable to prepare download: {str(e)[:100]}")
-            # Fallback: right-click to save
-            st.markdown("**Alternative Download Method:**")
-            st.markdown("Right-click the image above and select 'Save Image As...'")
+            st.error(f"⚠️ Unable to prepare download: {str(e)[:100]}")
+            st.markdown("**📱 Manual Save Method:**")
+            st.info("Tap and hold on the image above, then select 'Add to Photos' or 'Save Image'")
         
         st.markdown("---")
         
