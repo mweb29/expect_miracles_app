@@ -17,6 +17,7 @@ from PIL import Image
 import os
 import tempfile
 import requests
+import urllib.parse
 
 # Import HEIC support
 try:
@@ -177,6 +178,13 @@ def apply_custom_css():
         font-size: 1rem;
     }
     
+    .stTextArea>div>div>textarea {
+        border-radius: 10px;
+        border: 2px solid #ddd;
+        padding: 0.75rem;
+        font-size: 1rem;
+    }
+    
     /* Footer styling */
     .footer {
         text-align: center;
@@ -232,7 +240,7 @@ def init_session_state():
     if 'last_name' not in st.session_state:
         st.session_state.last_name = ""
     if 'accessory' not in st.session_state:
-        st.session_state.accessory = "None"
+        st.session_state.accessory = ""
     if 'openai_client' not in st.session_state:
         st.session_state.openai_client = None
 
@@ -300,8 +308,8 @@ def generate_superhero_image(uploaded_image, first_name, last_name, accessory):
     Parameters:
     - uploaded_image: PIL Image object
     - first_name: User's first name
-    - last_name: User's last name
-    - accessory: Selected accessory/prop
+    - last_name: User's last name (optional)
+    - accessory: User-specified accessories/props
     
     Returns:
     - image_url: URL of generated image or None if failed
@@ -315,59 +323,51 @@ def generate_superhero_image(uploaded_image, first_name, last_name, accessory):
     client = st.session_state.openai_client
     
     # Build full name for display
-    full_name = f"{first_name} {last_name}"
-    
-    # Build accessories text based on user selection
-    if accessory == "None":
-        accessories_text = "No additional accessories are needed - just the figure in confident heroic pose."
-    elif accessory == "Golf Club":
-        accessories_text = "Include two accessories: a golf club and a golf ball — both neatly positioned in the packaging alongside the figure."
-    elif accessory == "Tennis Racket":
-        accessories_text = "Include two accessories: a tennis racket and a tennis ball — both neatly positioned in the packaging alongside the figure."
-    elif accessory == "Stethoscope":
-        accessories_text = "Include two accessories: a stethoscope and a medical bag — both neatly positioned in the packaging alongside the figure."
-    elif accessory == "Basketball":
-        accessories_text = "Include two accessories: a basketball and a sports drink — both neatly positioned in the packaging alongside the figure."
-    elif accessory == "Camera":
-        accessories_text = "Include two accessories: a professional camera and photography equipment — both neatly positioned in the packaging alongside the figure."
-    elif accessory == "Microphone":
-        accessories_text = "Include two accessories: a microphone and a speaker — both neatly positioned in the packaging alongside the figure."
-    elif accessory == "Chef's Hat":
-        accessories_text = "Include two accessories: a chef's hat and cooking utensils — both neatly positioned in the packaging alongside the figure."
-    elif accessory == "Artist's Paintbrush":
-        accessories_text = "Include two accessories: a paintbrush and an art palette — both neatly positioned in the packaging alongside the figure."
-    elif accessory == "Laptop":
-        accessories_text = "Include two accessories: a laptop and tech gadgets — both neatly positioned in the packaging alongside the figure."
-    elif accessory == "Music Instrument":
-        accessories_text = "Include two accessories: a musical instrument and headphones — both neatly positioned in the packaging alongside the figure."
+    if last_name.strip():
+        full_name = f"{first_name} {last_name}"
     else:
-        accessories_text = f"Include accessories: {accessory.lower()} — neatly positioned in the packaging alongside the figure."
+        full_name = first_name
     
-    # Create the prompt for gpt-image-1
+    # Build accessories text based on user input
+    if accessory.strip():
+        accessories_text = f"Include accessories that represent: {accessory}. These should be neatly positioned in the packaging alongside the figure, looking professional and store-ready."
+    else:
+        accessories_text = "No additional accessories are needed - just the figure in confident heroic pose."
+    
+    # Create the enhanced prompt with new requirements
     prompt = f"""Create a realistic, store-ready action figure of a person named {full_name}, based on the uploaded reference image. 
 The final result should look like a premium Hasbro or Marvel Legends collectible toy photographed for retail packaging.
 
+CRITICAL REQUIREMENTS:
+- Make the photo look as realistic as possible while ensuring the final image is flattering and professional
+- The person should look their best - enhance the image quality while maintaining their authentic likeness
+
 Packaging Design:
-- Vertical portrait orientation, resembling authentic toy box packaging.
-- {full_name}'s figure should appear centered inside a clear plastic blister on a sturdy cardboard backing.
-- Prominently display the phrase "I'M TAKING ACTION AGAINST CANCER" near the top or middle of the box in bold, inspiring, heroic typography.
-- Include the name "{full_name}" clearly visible on the packaging.
-- Include stylish brand-like markings and subtle charity branding (without logos).
-- The background should be vibrant and motivational — glowing gradients, heroic energy bursts, or metallic blues and golds that evoke hope and strength.
+- Vertical portrait orientation, resembling authentic toy box packaging
+- Use BLUE and PURPLE colors for the packaging design (rich royal blues and vibrant purples that complement each other)
+- {full_name}'s figure should appear centered inside a clear plastic blister on a sturdy cardboard backing
+- Prominently display the phrase "I'M TAKING ACTION AGAINST CANCER" near the top or middle of the box in bold, inspiring, heroic typography
+- Include the sub-title "Expect Miracles" in elegant, prominent text on the packaging
+- Include the name "{full_name}" clearly visible on the packaging
+- Include stylish brand-like markings and subtle charity branding
+- The background should use vibrant blues and purples with motivational energy - glowing gradients, heroic energy bursts, or metallic blues and purples that evoke hope and strength
 
 Action Figure Details:
-- Maintain {full_name}'s exact facial likeness from the uploaded photo.
-- Keep the person in their actual clothing from the photo (do not change outfits).
-- Give them a confident, heroic stance with strong lighting and realistic reflections.
-- Ensure the figure accurately represents the person's appearance, gender, hair, and style from the reference image.
+- Maintain {full_name}'s exact facial likeness from the uploaded photo
+- Make the representation extremely flattering while maintaining authenticity
+- Keep the person in their actual clothing from the photo (do not change outfits)
+- Give them a confident, heroic stance with strong lighting and realistic reflections
+- Ensure the figure accurately represents the person's appearance, gender, hair, and style from the reference image
 - {accessories_text}
-- Ensure realistic lighting, materials, and shadows so the scene looks like a professional product photo.
+- Ensure realistic lighting, materials, and shadows so the scene looks like a professional product photo
 
 Overall Style:
-- Photorealistic finish with professional toy photography quality.
-- Clean edges, clear focus, and rich textures.
-- Ready-for-market presentation — bold, inspiring, and polished.
-- The figure should look like a collectible action figure of a real person, not a fictional character."""
+- Photorealistic finish with professional toy photography quality
+- The image should be flattering and magazine-quality
+- Clean edges, clear focus, and rich textures
+- Ready-for-market presentation - bold, inspiring, and polished
+- The figure should look like a collectible action figure of a real person, not a fictional character
+- Blue and purple color scheme throughout the packaging design"""
     
     try:
         # Convert PIL Image to bytes for upload with proper format
@@ -558,7 +558,7 @@ def step_1_upload():
             if image.mode not in ('RGB', 'RGBA'):
                 image = image.convert('RGB')
             
-            st.image(image, caption="Your Photo", width='stretch')
+            st.image(image, caption="Your Photo", use_container_width=True)
             
             # Store in session state
             st.session_state.uploaded_image = image
@@ -602,39 +602,27 @@ def step_2_details():
     
     with col2:
         last_name = st.text_input(
-            "Last Name *",
+            "Last Name (Optional)",
             value=st.session_state.last_name,
             placeholder="e.g., Johnson",
-            help="Required - this will appear on your action figure",
+            help="Optional - this will appear on your action figure if provided",
             key="last_name_input"
         )
     
-    # Accessory selection
-    accessory_options = [
-        "None",
-        "Golf Club",
-        "Tennis Racket",
-        "Stethoscope",
-        "Basketball",
-        "Camera",
-        "Microphone",
-        "Chef's Hat",
-        "Artist's Paintbrush",
-        "Laptop",
-        "Music Instrument"
-    ]
-    
-    accessory = st.selectbox(
-        "Choose Your Superhero Accessory (Optional)",
-        options=accessory_options,
-        help="These will be incorporated into your action figure packaging!",
-        key="accessory_select"
+    # Accessory text area - changed from dropdown to open field
+    accessory = st.text_area(
+        "Describe Your Superhero Accessories (Optional)",
+        value=st.session_state.accessory,
+        placeholder="e.g., golf club and golf ball, tennis racket, stethoscope, basketball, camera, microphone, chef's hat, paintbrush, laptop, etc.",
+        help="Describe any accessories or props you'd like included in your action figure packaging. Be specific!",
+        height=100,
+        key="accessory_input"
     )
     
-    if accessory == "None":
-        st.info("💡 **Tip:** Selecting an accessory will add themed items to your action figure packaging!")
+    if accessory.strip():
+        st.info(f"💡 **Selected:** Your action figure will include: {accessory}")
     else:
-        st.info(f"💡 **Selected:** Your action figure will include a {accessory.lower()} and related accessories!")
+        st.info("💡 **Tip:** Adding accessories will personalize your action figure packaging with themed items!")
     
     # Navigation buttons
     col1, col2 = st.columns(2)
@@ -648,8 +636,6 @@ def step_2_details():
         if st.button("🚀 Generate My Superhero!", key="generate_button", type="primary"):
             if not first_name.strip():
                 st.error("⚠️ Please enter your first name to continue")
-            elif not last_name.strip():
-                st.error("⚠️ Please enter your last name to continue")
             else:
                 # Save to session state
                 st.session_state.first_name = first_name
@@ -713,15 +699,21 @@ def step_4_share():
     """Step 4: Display and Share Results"""
     st.markdown('<div class="content-card">', unsafe_allow_html=True)
     
-    st.markdown(f"### 🎉 Congratulations, {st.session_state.first_name} {st.session_state.last_name}!")
+    # Build display name
+    if st.session_state.last_name.strip():
+        display_name = f"{st.session_state.first_name} {st.session_state.last_name}"
+    else:
+        display_name = st.session_state.first_name
+    
+    st.markdown(f"### 🎉 Congratulations, {display_name}!")
     st.markdown("**You are now a superhero in the fight against cancer!**")
     
     # Display the generated image
     if st.session_state.generated_image_url:
         st.image(
             st.session_state.generated_image_url,
-            caption=f"{st.session_state.first_name} {st.session_state.last_name} - Cancer Fighting Superhero",
-            width='stretch'
+            caption=f"{display_name} - Cancer Fighting Superhero",
+            use_container_width=True
         )
         
         st.markdown("---")
@@ -756,7 +748,7 @@ def step_4_share():
             st.download_button(
                 label="💾 Download Image (Desktop/Android)",
                 data=st.session_state.downloaded_image,
-                file_name=f"{st.session_state.first_name}_{st.session_state.last_name}_superhero.png",
+                file_name=f"{st.session_state.first_name}_superhero.png",
                 mime="image/png",
                 key="download_image",
                 use_container_width=True
@@ -780,7 +772,7 @@ def step_4_share():
             st.markdown(
                 f"""
                 <div style="margin: 20px 0;">
-                    <a href="data:image/png;base64,{img_base64}" download="{st.session_state.first_name}_{st.session_state.last_name}_superhero.png" style="text-decoration: none;">
+                    <a href="data:image/png;base64,{img_base64}" download="{st.session_state.first_name}_superhero.png" style="text-decoration: none;">
                         <button style="
                             background: linear-gradient(90deg, #ffd700 0%, #ffed4e 100%);
                             color: #1a237e;
@@ -810,22 +802,62 @@ def step_4_share():
         
         st.markdown("---")
         
-        # Social sharing instructions
+        # LinkedIn Direct Share Button
         st.markdown("### 📱 Share on Social Media")
         
-        st.info("💡 **How to Share:**\n1. Download your action figure image using the button above\n2. Share it on your favorite social media platform\n3. Use the hashtags: #ExpectMiracles #CancerResearch #TakeAction")
+        # LinkedIn share functionality
+        linkedin_text = f"""I just became a superhero in the fight against cancer with Expect Miracles Foundation! 💪🦸
+
+Join me in taking action against cancer research.
+
+#ExpectMiracles #CancerResearch #TakeAction #CancerAwareness"""
         
-        # LinkedIn sharing instructions
-        with st.expander("📱 Share on LinkedIn"):
+        # URL encode the text
+        encoded_text = urllib.parse.quote(linkedin_text)
+        linkedin_url = f"https://www.linkedin.com/feed/?shareActive=true&text={encoded_text}"
+        
+        # Create LinkedIn button with custom styling
+        st.markdown(
+            f"""
+            <div style="margin: 20px 0;">
+                <a href="{linkedin_url}" target="_blank" style="text-decoration: none;">
+                    <button style="
+                        background: #0077B5;
+                        color: white;
+                        padding: 15px 30px;
+                        border: none;
+                        border-radius: 25px;
+                        font-size: 18px;
+                        font-weight: bold;
+                        width: 100%;
+                        cursor: pointer;
+                        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 10px;
+                    ">
+                        <span style="font-size: 24px;">in</span>
+                        Share to LinkedIn
+                    </button>
+                </a>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+        
+        st.info("💡 **LinkedIn Sharing:** Click the button above to share on LinkedIn. You'll need to manually attach your downloaded superhero image after LinkedIn opens!")
+        
+        # Other social sharing instructions
+        with st.expander("📱 Share on Other Platforms"):
             st.markdown("""
-            **To share on LinkedIn:**
-            1. Click the download button above
-            2. Go to [LinkedIn.com](https://www.linkedin.com)
-            3. Click "Start a post"
-            4. Upload your downloaded image
-            5. Add this message:
+            **To share on Instagram, Facebook, or Twitter:**
+            1. Download your action figure image using the button above
+            2. Open your favorite social media app
+            3. Create a new post and upload your downloaded image
+            4. Add this message:
             
-            *"I just became a superhero in the fight against cancer with Expect Miracles Foundation! Join me in taking action against cancer. #ExpectMiracles #CancerResearch #TakeAction"*
+            *"I just became a superhero in the fight against cancer with Expect Miracles Foundation! 💪🦸 Join me in taking action against cancer. #ExpectMiracles #CancerResearch #TakeAction"*
             """)
         
         # Email sharing
@@ -848,7 +880,7 @@ def step_4_share():
             st.session_state.generated_image_url = None
             st.session_state.first_name = ""
             st.session_state.last_name = ""
-            st.session_state.accessory = "None"
+            st.session_state.accessory = ""
             if 'downloaded_image' in st.session_state:
                 del st.session_state.downloaded_image
             st.rerun()
