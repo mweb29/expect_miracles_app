@@ -570,8 +570,6 @@ def step_1_upload():
         except Exception as e:
             st.error(f"⚠️ Error loading image: {e}")
             st.info("💡 If you're uploading a HEIC file from iPhone, try converting it to JPG first.")
-    else:
-        st.info("👆 Tap above to take a photo or select one from your device")
     
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -909,11 +907,9 @@ def main():
     render_header()
     
     # Show status message based on API configuration (simpler version)
-    if st.session_state.openai_client is not None:
-        st.success("✅ **API Connected**: Ready to generate action figure images!")
-    else:
+    if st.session_state.openai_client is None:
         st.error("⚠️ **API Not Configured**: Please check your OpenAI API key configuration.")
-    
+
     # Render step indicator
     render_step_indicator(st.session_state.step)
     
