@@ -524,8 +524,7 @@ def render_footer():
 # ============================================================================
 def step_1_upload():
     """Step 1: Photo Upload"""
-    st.markdown('<div class="content-card">', unsafe_allow_html=True)
-    
+
     st.markdown("### 📸 Step 1: Upload Your Photo")
     st.markdown("Choose a clear photo of yourself for the best action figure transformation")
     
@@ -575,7 +574,6 @@ def step_1_upload():
 
 def step_2_details():
     """Step 2: Personal Details"""
-    st.markdown('<div class="content-card">', unsafe_allow_html=True)
     
     st.markdown("### 🦸 Step 2: Your Details")
     st.markdown("Tell us about yourself to create your unique action figure identity")
@@ -645,8 +643,7 @@ def step_2_details():
     st.markdown('</div>', unsafe_allow_html=True)
 
 def step_3_generate():
-    """Step 3: Generate Superhero Image"""
-    st.markdown('<div class="content-card">', unsafe_allow_html=True)
+    """Step 3: Generate Action Figure Image"""
     
     # Auto-generate if not already generated
     if st.session_state.generated_image_url is None:
@@ -695,7 +692,6 @@ def step_3_generate():
 
 def step_4_share():
     """Step 4: Display and Share Results"""
-    st.markdown('<div class="content-card">', unsafe_allow_html=True)
     
     # Build display name
     if st.session_state.last_name.strip():
