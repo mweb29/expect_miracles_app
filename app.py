@@ -1,7 +1,7 @@
 """
-Expect Miracles Superhero Generator
+Expect Miracles Action Figure Generator
 ====================================
-A Streamlit app that transforms event attendees into superheroes fighting cancer.
+A Streamlit app that transforms event attendees into action figures fighting cancer.
 Built for live fundraising events with 350-500 attendees accessing via QR code.
 
 Author: Expect Miracles Foundation
@@ -31,7 +31,7 @@ except ImportError:
 # PAGE CONFIGURATION - Must be the first Streamlit command
 # ============================================================================
 st.set_page_config(
-    page_title="Expect Miracles - Superhero Generator",
+    page_title="Expect Miracles - Action Figure Generator",
     page_icon="💪",
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -386,7 +386,7 @@ Overall Style:
         img_byte_arr.name = "uploaded_image.png"
         
         # Show progress to user
-        with st.spinner("🦸 Transforming you into a superhero action figure... This may take 30-60 seconds..."):
+        with st.spinner("🦸 Transforming you into an action figure... This may take 30-60 seconds..."):
             # Call OpenAI gpt-image-1 API with image editing
             response = client.images.edit(
                 model="gpt-image-1",
@@ -443,7 +443,7 @@ def render_header():
     st.markdown("""
     <div class="header-container">
         <div class="main-title">💪 Take Action Against Cancer</div>
-        <div class="subtitle">Become a Superhero and Join the Fight</div>
+        <div class="subtitle">Become an Action Figure and Join the Fight</div>
         <div class="tagline">Transform yourself into a hero fighting for cancer research</div>
     </div>
     """, unsafe_allow_html=True)
@@ -514,7 +514,7 @@ def render_footer():
     st.markdown("""
     <div class="footer">
         <p>Powered by <strong>Expect Miracles Foundation</strong> | Built with Streamlit & OpenAI</p>
-        <p>Every superhero created supports cancer research and brings hope to families affected by cancer.</p>
+        <p>Every action figure created supports cancer research and brings hope to families affected by cancer.</p>
         <p>© 2025 Expect Miracles Foundation - All Rights Reserved</p>
     </div>
     """, unsafe_allow_html=True)
@@ -527,7 +527,7 @@ def step_1_upload():
     st.markdown('<div class="content-card">', unsafe_allow_html=True)
     
     st.markdown("### 📸 Step 1: Upload Your Photo")
-    st.markdown("Choose a clear photo of yourself for the best superhero transformation")
+    st.markdown("Choose a clear photo of yourself for the best action figure transformation")
     
     # Add helpful tips for best results
     st.info("💡 **Best Results:** Use a clear headshot or upper-body photo with good lighting and a plain background. Professional headshots work great!")
@@ -580,7 +580,7 @@ def step_2_details():
     st.markdown('<div class="content-card">', unsafe_allow_html=True)
     
     st.markdown("### 🦸 Step 2: Your Details")
-    st.markdown("Tell us about yourself to create your unique superhero identity")
+    st.markdown("Tell us about yourself to create your unique action figure identity")
     
     # Show uploaded image thumbnail
     if st.session_state.uploaded_image:
@@ -611,7 +611,7 @@ def step_2_details():
     
     # Accessory text area - changed from dropdown to open field
     accessory = st.text_area(
-        "Describe Your Superhero Accessories (Optional)",
+        "Describe Your Action Figure Accessories (Optional)",
         value=st.session_state.accessory,
         placeholder="e.g., golf club and golf ball, tennis racket, stethoscope, basketball, camera, microphone, chef's hat, paintbrush, laptop, etc.",
         help="Describe any accessories or props you'd like included in your action figure packaging. Be specific!",
@@ -633,7 +633,7 @@ def step_2_details():
             st.rerun()
     
     with col2:
-        if st.button("🚀 Generate My Superhero!", key="generate_button", type="primary"):
+        if st.button("🚀 Generate My Action Figure!", key="generate_button", type="primary"):
             if not first_name.strip():
                 st.error("⚠️ Please enter your first name to continue")
             else:
@@ -652,7 +652,7 @@ def step_3_generate():
     
     # Auto-generate if not already generated
     if st.session_state.generated_image_url is None:
-        st.markdown("### ⚡ Generating Your Superhero...")
+        st.markdown("### ⚡ Generating Your Action Figure...")
         
         # Generate the image
         try:
@@ -706,20 +706,20 @@ def step_4_share():
         display_name = st.session_state.first_name
     
     st.markdown(f"### 🎉 Congratulations, {display_name}!")
-    st.markdown("**You are now a superhero in the fight against cancer!**")
+    st.markdown("**You are now an action figure in the fight against cancer!**")
     
     # Display the generated image
     if st.session_state.generated_image_url:
         st.image(
             st.session_state.generated_image_url,
-            caption=f"{display_name} - Cancer Fighting Superhero",
+            caption=f"{display_name} - Cancer Fighting Action Figure",
             use_container_width=True
         )
         
         st.markdown("---")
         
         # Action buttons
-        st.markdown("### 📤 Save & Share Your Superhero")
+        st.markdown("### 📤 Save & Share Your Action Figure")
         
         # MOBILE-FRIENDLY DOWNLOAD SECTION
         # Prepare image data for both download methods
@@ -748,7 +748,7 @@ def step_4_share():
             st.download_button(
                 label="💾 Download Image (Desktop/Android)",
                 data=st.session_state.downloaded_image,
-                file_name=f"{st.session_state.first_name}_superhero.png",
+                file_name=f"{st.session_state.first_name}_action_figure.png",
                 mime="image/png",
                 key="download_image",
                 use_container_width=True
@@ -762,8 +762,8 @@ def step_4_share():
                 **To save on your iPhone:**
                 1. **TAP AND HOLD** (long press) on the image above for 2-3 seconds
                 2. A menu will appear - select **"Add to Photos"** or **"Save Image"**
-                3. Your superhero image will be saved to your Photos app! 📸
-                
+                3. Your action figure image will be saved to your Photos app! 📸
+
                 ✅ This is the most reliable method for iPhones!
                 """
             )
@@ -772,7 +772,7 @@ def step_4_share():
             st.markdown(
                 f"""
                 <div style="margin: 20px 0;">
-                    <a href="data:image/png;base64,{img_base64}" download="{st.session_state.first_name}_superhero.png" style="text-decoration: none;">
+                    <a href="data:image/png;base64,{img_base64}" download="{st.session_state.first_name}_action_figure.png" style="text-decoration: none;">
                         <button style="
                             background: linear-gradient(90deg, #ffd700 0%, #ffed4e 100%);
                             color: #1a237e;
@@ -806,7 +806,7 @@ def step_4_share():
         st.markdown("### 📱 Share on Social Media")
         
         # LinkedIn share functionality
-        linkedin_text = f"""I just became a superhero in the fight against cancer with Expect Miracles Foundation! 💪🦸
+        linkedin_text = f"""I just became an action figure in the fight against cancer with Expect Miracles Foundation! 💪🦸
 
 Join me in taking action against cancer research.
 
@@ -846,7 +846,7 @@ Join me in taking action against cancer research.
             unsafe_allow_html=True
         )
         
-        st.info("💡 **LinkedIn Sharing:** Click the button above to share on LinkedIn. You'll need to manually attach your downloaded superhero image after LinkedIn opens!")
+        st.info("💡 **LinkedIn Sharing:** Click the button above to share on LinkedIn. You'll need to manually attach your downloaded action figure image after LinkedIn opens!")
         
         # Other social sharing instructions
         with st.expander("📱 Share on Other Platforms"):
@@ -856,8 +856,8 @@ Join me in taking action against cancer research.
             2. Open your favorite social media app
             3. Create a new post and upload your downloaded image
             4. Add this message:
-            
-            *"I just became a superhero in the fight against cancer with Expect Miracles Foundation! 💪🦸 Join me in taking action against cancer. #ExpectMiracles #CancerResearch #TakeAction"*
+
+            *"I just became an action figure in the fight against cancer with Expect Miracles Foundation! 💪🦸 Join me in taking action against cancer. #ExpectMiracles #CancerResearch #TakeAction"*
             """)
         
         # Email sharing
@@ -873,7 +873,7 @@ Join me in taking action against cancer research.
         st.markdown("---")
         
         # Create another
-        if st.button("🔄 Create Another Superhero", key="create_another"):
+        if st.button("🔄 Create Another Action Figure", key="create_another"):
             # Reset session state including downloaded image
             st.session_state.step = 1
             st.session_state.uploaded_image = None
@@ -910,7 +910,7 @@ def main():
     
     # Show status message based on API configuration (simpler version)
     if st.session_state.openai_client is not None:
-        st.success("✅ **API Connected**: Ready to generate superhero images!")
+        st.success("✅ **API Connected**: Ready to generate action figure images!")
     else:
         st.error("⚠️ **API Not Configured**: Please check your OpenAI API key configuration.")
     
