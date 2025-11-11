@@ -386,7 +386,7 @@ Overall Style:
         img_byte_arr.name = "uploaded_image.png"
         
         # Show progress to user
-        with st.spinner("🦸 Transforming you into an action figure... This may take 30-60 seconds..."):
+        with st.spinner("🦸 Transforming you into an action figure... This may take 60-90 seconds..."):
             # Call OpenAI gpt-image-1 API with image editing
             response = client.images.edit(
                 model="gpt-image-1",
@@ -709,9 +709,7 @@ def step_4_share():
             caption=f"{display_name} - Cancer Fighting Action Figure",
             use_container_width=True
         )
-        
-        st.markdown("---")
-        
+                
         # Action buttons
         st.markdown("### 📤 Save & Share Your Action Figure")
         
@@ -746,45 +744,6 @@ def step_4_share():
                 mime="image/png",
                 key="download_image",
                 use_container_width=True
-            )
-            
-            # METHOD 2: iPhone-specific instructions (most reliable for iOS)
-            st.markdown("---")
-            st.markdown("### 📱 **For iPhone/iPad Users:**")
-            st.info(
-                """
-                **To save on your iPhone:**
-                1. **TAP AND HOLD** (long press) on the image above for 2-3 seconds
-                2. A menu will appear - select **"Add to Photos"** or **"Save Image"**
-                3. Your action figure image will be saved to your Photos app! 📸
-
-                ✅ This is the most reliable method for iPhones!
-                """
-            )
-            
-            # METHOD 3: Alternative HTML link for iOS (backup method)
-            st.markdown(
-                f"""
-                <div style="margin: 20px 0;">
-                    <a href="data:image/png;base64,{img_base64}" download="{st.session_state.first_name}_action_figure.png" style="text-decoration: none;">
-                        <button style="
-                            background: linear-gradient(90deg, #ffd700 0%, #ffed4e 100%);
-                            color: #1a237e;
-                            padding: 15px 30px;
-                            border: none;
-                            border-radius: 25px;
-                            font-size: 18px;
-                            font-weight: bold;
-                            width: 100%;
-                            cursor: pointer;
-                            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-                        ">
-                            📥 Alternative Download Link (iOS Backup)
-                        </button>
-                    </a>
-                </div>
-                """,
-                unsafe_allow_html=True
             )
             
             st.caption("💡 **Tip:** If the download buttons don't work on your device, use the 'tap and hold' method above - it works on all iPhones!")
@@ -841,29 +800,7 @@ Join me in taking action against cancer research.
         )
         
         st.info("💡 **LinkedIn Sharing:** Click the button above to share on LinkedIn. You'll need to manually attach your downloaded action figure image after LinkedIn opens!")
-        
-        # Other social sharing instructions
-        with st.expander("📱 Share on Other Platforms"):
-            st.markdown("""
-            **To share on Instagram, Facebook, or Twitter:**
-            1. Download your action figure image using the button above
-            2. Open your favorite social media app
-            3. Create a new post and upload your downloaded image
-            4. Add this message:
-
-            *"I just became an action figure in the fight against cancer with Expect Miracles Foundation! 💪🦸 Join me in taking action against cancer. #ExpectMiracles #CancerResearch #TakeAction"*
-            """)
-        
-        # Email sharing
-        with st.expander("📧 Share via Email"):
-            st.markdown("""
-            **To share via email:**
-            1. Download your action figure image
-            2. Compose a new email
-            3. Attach the downloaded image
-            4. Share your story about taking action against cancer!
-            """)
-        
+             
         st.markdown("---")
         
         # Create another
