@@ -442,9 +442,8 @@ def render_header():
     """Render the app header with branding"""
     st.markdown("""
     <div class="header-container">
-        <div class="main-title">💪 Take Action Against Cancer</div>
+        <div class="main-title">Take Action Against Cancer</div>
         <div class="subtitle">Become an Action Figure and Join the Fight</div>
-        <div class="tagline">Transform yourself into a hero fighting for cancer research</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -798,9 +797,7 @@ Join me in taking action against cancer research.
             """,
             unsafe_allow_html=True
         )
-        
-        st.info("💡 **LinkedIn Sharing:** Click the button above to share on LinkedIn. You'll need to manually attach your downloaded action figure image after LinkedIn opens!")
-             
+
         st.markdown("---")
         
         # Create another
