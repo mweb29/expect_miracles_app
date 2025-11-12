@@ -447,66 +447,67 @@ def render_header():
     </div>
     """, unsafe_allow_html=True)
 
-def render_step_indicator(current_step):
-    """Render step progress indicator"""
-    
-    # Using Streamlit columns instead of HTML for better compatibility
-    st.markdown("<br>", unsafe_allow_html=True)
-    
-    col1, col2, col3, col4 = st.columns(4)
-    
-    steps = [
-        (col1, "1", "Upload", 1),
-        (col2, "2", "Details", 2),
-        (col3, "3", "Generate", 3),
-        (col4, "4", "Share", 4)
-    ]
-    
-    for col, num, label, step_num in steps:
-        with col:
-            # Determine if step is active
-            if step_num <= current_step:
-                # Active step - cyan background
-                st.markdown(f"""
-                    <div style="text-align: center;">
-                        <div style="
-                            width: 50px;
-                            height: 50px;
-                            border-radius: 50%;
-                            background: #00d4ff;
-                            color: white;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            font-weight: bold;
-                            font-size: 1.2rem;
-                            margin: 0 auto;
-                        ">{num}</div>
-                        <div style="color: white; margin-top: 0.5rem; font-size: 0.9rem;">{label}</div>
-                    </div>
-                """, unsafe_allow_html=True)
-            else:
-                # Inactive step - gray background
-                st.markdown(f"""
-                    <div style="text-align: center;">
-                        <div style="
-                            width: 50px;
-                            height: 50px;
-                            border-radius: 50%;
-                            background: #ddd;
-                            color: #999;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            font-weight: bold;
-                            font-size: 1.2rem;
-                            margin: 0 auto;
-                        ">{num}</div>
-                        <div style="color: white; margin-top: 0.5rem; font-size: 0.9rem;">{label}</div>
-                    </div>
-                """, unsafe_allow_html=True)
-    
-    st.markdown("<br>", unsafe_allow_html=True)
+# Commenting out progress bar for simplified UI at event
+# def render_step_indicator(current_step):
+#     """Render step progress indicator"""
+#
+#     # Using Streamlit columns instead of HTML for better compatibility
+#     st.markdown("<br>", unsafe_allow_html=True)
+#
+#     col1, col2, col3, col4 = st.columns(4)
+#
+#     steps = [
+#         (col1, "1", "Upload", 1),
+#         (col2, "2", "Details", 2),
+#         (col3, "3", "Generate", 3),
+#         (col4, "4", "Share", 4)
+#     ]
+#
+#     for col, num, label, step_num in steps:
+#         with col:
+#             # Determine if step is active
+#             if step_num <= current_step:
+#                 # Active step - cyan background
+#                 st.markdown(f"""
+#                     <div style="text-align: center;">
+#                         <div style="
+#                             width: 50px;
+#                             height: 50px;
+#                             border-radius: 50%;
+#                             background: #00d4ff;
+#                             color: white;
+#                             display: flex;
+#                             align-items: center;
+#                             justify-content: center;
+#                             font-weight: bold;
+#                             font-size: 1.2rem;
+#                             margin: 0 auto;
+#                         ">{num}</div>
+#                         <div style="color: white; margin-top: 0.5rem; font-size: 0.9rem;">{label}</div>
+#                     </div>
+#                 """, unsafe_allow_html=True)
+#             else:
+#                 # Inactive step - gray background
+#                 st.markdown(f"""
+#                     <div style="text-align: center;">
+#                         <div style="
+#                             width: 50px;
+#                             height: 50px;
+#                             border-radius: 50%;
+#                             background: #ddd;
+#                             color: #999;
+#                             display: flex;
+#                             align-items: center;
+#                             justify-content: center;
+#                             font-weight: bold;
+#                             font-size: 1.2rem;
+#                             margin: 0 auto;
+#                         ">{num}</div>
+#                         <div style="color: white; margin-top: 0.5rem; font-size: 0.9rem;">{label}</div>
+#                     </div>
+#                 """, unsafe_allow_html=True)
+#
+#     st.markdown("<br>", unsafe_allow_html=True)
 
 def render_footer():
     """Render app footer"""
@@ -841,8 +842,8 @@ def main():
         st.error("⚠️ **API Not Configured**: Please check your OpenAI API key configuration.")
 
     # Render step indicator
-    render_step_indicator(st.session_state.step)
-    
+    # render_step_indicator(st.session_state.step)  # Commented out for simplified UI at event
+
     # Route to appropriate step
     if st.session_state.step == 1:
         step_1_upload()
