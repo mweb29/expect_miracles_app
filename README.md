@@ -1,10 +1,10 @@
-# Expect Miracles - Superhero Generator 💪
+# Expect Miracles - Action Figure Generator 💪
 
-A Streamlit web application that transforms event attendees into superheroes fighting cancer. Built for live fundraising events with 350-500 attendees accessing via QR code.
+A Streamlit web application that transforms event attendees into action figures fighting cancer. Built for live fundraising events with 350-500 attendees accessing via QR code.
 
 ## About
 
-The Expect Miracles Superhero Generator is an interactive web app designed for the Expect Miracles Foundation's fundraising events. Attendees can upload their photos and transform into cancer-fighting superhero action figures using AI-powered image generation.
+The Expect Miracles Action Figure Generator is an interactive web app designed for the Expect Miracles Foundation's fundraising events. Attendees can upload their photos and transform into cancer-fighting action figures using AI-powered image generation.
 
 **Key Features:**
 - **Mobile-First Design:** Optimized for smartphones with responsive UI
@@ -112,8 +112,8 @@ expect_miracles_app/
      - Music Instrument (includes headphones)
 
 3. **Step 3 - Generate**:
-   - AI automatically generates your superhero action figure
-   - Takes approximately 30-60 seconds
+   - AI automatically generates your action figure
+   - Takes approximately 60-90 seconds
    - Creates a realistic action figure packaging with:
      - Your exact facial likeness
      - Your actual clothing from the photo
@@ -122,10 +122,10 @@ expect_miracles_app/
      - Selected accessories in packaging
 
 4. **Step 4 - Share**:
-   - Download your superhero image
+   - Download your action figure image
    - Share to LinkedIn with pre-written message
    - Send via email
-   - Create another superhero (resets the process)
+   - Create another action figure (resets the process)
 
 ## QR Code Generator for Events
 
@@ -170,7 +170,7 @@ The app uses OpenAI's **gpt-image-1** model with the following settings:
 - **API Endpoint:** `client.images.edit()`
 - **Size:** 1024x1536 pixels (portrait orientation for action figure packaging)
 - **Input Format:** PNG (automatically converted from uploaded images)
-- **Generation Time:** Approximately 30-60 seconds per image
+- **Generation Time:** Approximately 60-90 seconds per image
 
 **Important Notes:**
 - The app uses the `images.edit()` endpoint, not `images.generate()`
@@ -190,13 +190,18 @@ Brand colors (defined in `app.py` CSS):
 ### Prompt Engineering
 
 The app uses a sophisticated prompt that:
+- Creates vertical hanging blister pack packaging (modern 2020s collectible style)
+- Deep purple (#7b2c85) background with blue accents and energy effects
+- Includes professional photo retouching for flattering, magazine-quality results
 - Maintains exact facial likeness from the uploaded photo
 - Keeps original clothing from the reference image
-- Creates realistic action figure packaging aesthetic
-- Includes "I'M TAKING ACTION AGAINST CANCER" message
-- Adds user's name to the packaging
-- Incorporates selected accessories with themed props
-- Emulates premium Hasbro/Marvel Legends collectible style
+- Features "I'M TAKING ACTION AGAINST CANCER" in bold comic-style lettering
+- Displays user's name prominently with chrome metallic effects
+- Incorporates "Expect Miracles" in elegant italic script
+- Adds cancer awareness ribbon icons (teal and pink)
+- Includes selected accessories with themed props inside the packaging
+- Creates realistic plastic blister transparency with highlights and reflections
+- Professional studio lighting for catalog-quality product photography
 
 ## Technical Implementation
 
@@ -229,7 +234,7 @@ The app uses a sophisticated prompt that:
 ### UI/UX Design
 
 - **Mobile-First:** Optimized for event attendees using smartphones
-- **Progress Indicators:** 4-step visual progress tracker
+- **Simplified Interface:** Clean, streamlined UI for event deployment (progress indicators commented out)
 - **Responsive Cards:** White content cards on blue gradient background
 - **Custom CSS:** Extensive styling for branded experience
 - **Auto-Navigation:** Automatically proceeds through generation steps
@@ -274,7 +279,7 @@ The app uses a sophisticated prompt that:
 - Review error details in debug output
 
 **Slow performance at events**
-- Each generation takes 30-60 seconds (expected)
+- Each generation takes 60-90 seconds (expected)
 - Consider multiple deployment instances for 350+ simultaneous users
 - Test bandwidth at event venue beforehand
 - Have backup QR codes ready

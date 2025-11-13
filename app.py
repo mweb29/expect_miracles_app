@@ -336,38 +336,56 @@ def generate_superhero_image(uploaded_image, first_name, last_name, accessory):
     
     # Create the enhanced prompt with new requirements
     prompt = f"""Create a realistic, store-ready action figure of a person named {full_name}, based on the uploaded reference image. 
-The final result should look like a premium Hasbro or Marvel Legends collectible toy photographed for retail packaging.
+The final result should look like a premium collectible toy photographed for retail blister packaging.
 
 CRITICAL REQUIREMENTS:
 - Make the photo look as realistic as possible while ensuring the final image is flattering and professional
-- The person should look their best - enhance the image quality while maintaining their authentic likeness
+- Apply professional photo retouching techniques: optimize lighting, smooth skin naturally, enhance colors, and present the person in their most confident, flattering appearance
+- The figure should look polished and magazine-ready while preserving the person's authentic identity and characteristics
+- Focus on good posture, confident expression, and professional presentation
+- Use a VERTICAL HANGING BLISTER PACK format (not the horizontal vintage-style card back)
 
 Packaging Design:
-- Vertical portrait orientation, resembling authentic toy box packaging
-- Use BLUE and PURPLE colors for the packaging design (rich royal blues and vibrant purples that complement each other)
-- {full_name}'s figure should appear centered inside a clear plastic blister on a sturdy cardboard backing
-- Prominently display the phrase "I'M TAKING ACTION AGAINST CANCER" near the top or middle of the box in bold, inspiring, heroic typography
-- Include the sub-title "Expect Miracles" in elegant, prominent text on the packaging
-- Include the name "{full_name}" clearly visible on the packaging
-- Include stylish brand-like markings and subtle charity branding
-- The background should use vibrant blues and purples with motivational energy - glowing gradients, heroic energy bursts, or metallic blues and purples that evoke hope and strength
+- VERTICAL portrait orientation with rounded top corners and a hanging hole at the top center
+- The packaging has a clear plastic blister in front and a colorful printed backing card behind
+- Deep PURPLE background (#7b2c85) as the primary color with BLUE accents on the backing card
+- The background features a bright blue-purple gradient with light rays, glowing energy effects, and star-like sparkles
+- Include small cancer awareness ribbon icons (teal and pink ribbons) subtly placed in the design
+- Large, bold title at top: "{full_name.upper()}: ACTION FIGURE" in bold comic-style lettering with metallic blue chrome effect and depth/shadow
+- Below that: "I'M TAKING ACTION AGAINST CANCER" in large white bold comic-style letters
+- Include "Expect Miracles" in elegant italic script below the main message
+- The plastic blister should have realistic transparency with subtle highlights and reflections showing the contours of the figure inside
+- Add small "Ages 8+" text and a fictional brand logo in bottom corners for authenticity
+- The font on the backing card should be bold comic-style lettering throughout
 
 Action Figure Details:
-- Maintain {full_name}'s exact facial likeness from the uploaded photo
-- Make the representation extremely flattering while maintaining authenticity
-- Keep the person in their actual clothing from the photo (do not change outfits)
-- Give them a confident, heroic stance with strong lighting and realistic reflections
-- Ensure the figure accurately represents the person's appearance, gender, hair, and style from the reference image
+- Show {full_name} as a highly detailed 6-inch scale action figure inside the clear plastic bubble
+- Maintain exact facial likeness from the uploaded photo - this is critical
+- The figure should be standing in a natural, confident pose with excellent posture
+- Keep them in their actual clothing from the reference photo (business casual, professional attire)
+- Include realistic fabric textures, creases, and details on the clothing
 - {accessories_text}
-- Ensure realistic lighting, materials, and shadows so the scene looks like a professional product photo
+- The accessories should be visible inside the packaging alongside the figure
+- Ensure accurate representation of gender, ethnicity, hair color/style, and all physical characteristics from the reference image
+- Present the figure in the most flattering, confident way possible while maintaining authentic likeness
+
+Photography & Lighting:
+- Professional product photography against a neutral light background (off-white or light gray)
+- Even, soft studio lighting with minimal harsh shadows that naturally flatters the figure
+- Realistic plastic blister reflections and highlights
+- The figure should be well-lit inside the packaging with clear visibility
+- Clean, sharp focus throughout - catalog-quality product shot
+- Slight shadow beneath the package to ground it realistically
+- Professional lighting that enhances features and creates a polished, magazine-quality appearance
 
 Overall Style:
-- Photorealistic finish with professional toy photography quality
-- The image should be flattering and magazine-quality
-- Clean edges, clear focus, and rich textures
-- Ready-for-market presentation - bold, inspiring, and polished
-- The figure should look like a collectible action figure of a real person, not a fictional character
-- Blue and purple color scheme throughout the packaging design"""
+- Modern collectible toy aesthetic (2020s style, not vintage 1980s)
+- The package should look clean, professional, and ready for retail display
+- Purple and blue color palette throughout, with purple as dominant color
+- Photorealistic finish - should look like an actual product you could buy
+- Make the figure flattering and magazine-ready while maintaining authentic likeness to the reference photo
+- The overall feeling should be inspiring, professional, and polished
+- Everyone should feel proud and excited to share their action figure on social media"""
     
     try:
         # Convert PIL Image to bytes for upload with proper format
