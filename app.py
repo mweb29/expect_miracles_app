@@ -343,11 +343,13 @@ CRITICAL REQUIREMENTS:
 - Apply professional photo retouching techniques: optimize lighting, smooth skin naturally, enhance colors, and present the person in their most confident, flattering appearance
 - The figure should look polished and magazine-ready while preserving the person's authentic identity and characteristics
 - Focus on good posture, confident expression, and professional presentation
-- Use a VERTICAL HANGING BLISTER PACK format (not the horizontal vintage-style card back)
+- Use a VERTICAL HANGING BLISTER PACK format for the packaging
+- Generate a FULL-BODY action figure showing the person from head to toe, completely contained within the plastic packaging
 
 Packaging Design:
 - VERTICAL portrait orientation with rounded top corners and a hanging hole at the top center
 - The packaging has a clear plastic blister in front and a colorful printed backing card behind
+- The plastic blister must be tall enough to contain the ENTIRE action figure from head to feet with small margins
 - Deep PURPLE background (#7b2c85) as the primary color with BLUE accents on the backing card
 - The background features a bright blue-purple gradient with light rays, glowing energy effects, and star-like sparkles
 - Include small cancer awareness ribbon icons (teal and pink ribbons) subtly placed in the design
@@ -359,24 +361,28 @@ Packaging Design:
 - The font on the backing card should be bold comic-style lettering throughout
 
 Action Figure Details:
-- Show {full_name} as a highly detailed 6-inch scale action figure inside the clear plastic bubble
+- Show {full_name} as a highly detailed 6-inch scale FULL-BODY action figure inside the clear plastic bubble
+- The figure must be completely visible from head to toe - showing face, torso, legs, and feet
 - Maintain exact facial likeness from the uploaded photo - this is critical
 - The figure should be standing in a natural, confident pose with excellent posture
-- Keep them in their actual clothing from the reference photo (business casual, professional attire)
-- Include realistic fabric textures, creases, and details on the clothing
+- Position the figure centered vertically in the packaging with the head near the top and feet near the bottom
+- Keep them in their actual clothing from the reference photo (business casual, professional attire) - show the complete outfit
+- Include realistic fabric textures, creases, and details on the clothing from head to toe
 - {accessories_text}
 - The accessories should be visible inside the packaging alongside the figure
 - Ensure accurate representation of gender, ethnicity, hair color/style, and all physical characteristics from the reference image
 - Present the figure in the most flattering, confident way possible while maintaining authentic likeness
+- The entire figure (head, body, legs, feet) must fit within the plastic blister boundaries
 
 Photography & Lighting:
 - Professional product photography against a neutral light background (off-white or light gray)
 - Even, soft studio lighting with minimal harsh shadows that naturally flatters the figure
 - Realistic plastic blister reflections and highlights
-- The figure should be well-lit inside the packaging with clear visibility
+- The figure should be well-lit inside the packaging with clear visibility from head to toe
 - Clean, sharp focus throughout - catalog-quality product shot
 - Slight shadow beneath the package to ground it realistically
 - Professional lighting that enhances features and creates a polished, magazine-quality appearance
+- Ensure the full body is evenly lit and clearly visible
 
 Overall Style:
 - Modern collectible toy aesthetic (2020s style, not vintage 1980s)
@@ -385,7 +391,8 @@ Overall Style:
 - Photorealistic finish - should look like an actual product you could buy
 - Make the figure flattering and magazine-ready while maintaining authentic likeness to the reference photo
 - The overall feeling should be inspiring, professional, and polished
-- Everyone should feel proud and excited to share their action figure on social media"""
+- Everyone should feel proud and excited to share their action figure on social media
+- The complete action figure from head to toe should be the focal point of the image"""
     
     try:
         # Convert PIL Image to bytes for upload with proper format
